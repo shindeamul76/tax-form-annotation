@@ -1,0 +1,781 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/shindeamul76/tax-form-annotation/main/schemas/annotation.schema.json",
+  "title": "Tax Form Annotation Document",
+  "description": "Validates a version 1.0 annotation document that maps values from a structured dataset to printable boxes on an exact U.S. tax-form PDF template.",
+  "type": "object",
+  "required": [
+    "annotationVersion",
+    "form",
+    "dataContract",
+    "coordinateSystem",
+    "defaults",
+    "fields"
+  ],
+  "properties": {
+    "annotationVersion": {
+      "description": "Version of the annotation specification, independent of the form tax year.",
+      "const": "1.0"
+    },
+    "form": {
+      "$ref": "#/$defs/formMetadata"
+    },
+    "dataContract": {
+      "$ref": "#/$defs/dataContract"
+    },
+    "coordinateSystem": {
+      "$ref": "#/$defs/coordinateSystem"
+    },
+    "defaults": {
+      "$ref": "#/$defs/annotationDefaults"
+    },
+    "fields": {
+      "description": "Ordered collection of values to render on the PDF template.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/fieldAnnotation"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "formMetadata": {
+      "title": "Form Metadata",
+      "description": "Identifies the exact PDF template for which the annotation was authored.",
+      "type": "object",
+      "required": [
+        "formId",
+        "title",
+        "taxYear",
+        "revision",
+        "templateFile",
+        "pages"
+      ],
+      "properties": {
+        "formId": {
+          "description": "Stable identifier for the tax-form family, independent of tax year and revision.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "title": {
+          "description": "Human-readable title of the tax form.",
+          "type": "string",
+          "minLength": 1
+        },
+        "taxYear": {
+          "description": "Four-digit tax year represented by the form.",
+          "type": "integer",
+          "minimum": 1900
+        },
+        "revision": {
+          "description": "Identifier for the exact template revision within the tax year.",
+          "type": "string",
+          "minLength": 1
+        },
+        "templateFile": {
+          "description": "Expected filename of the PDF template, without a directory path.",
+          "type": "string",
+          "pattern": "^.+\\.[Pp][Dd][Ff]$"
+        },
+        "templateSha256": {
+          "description": "Optional SHA-256 checksum of the exact PDF template bytes.",
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "pages": {
+          "description": "Expected pages and their dimensions in PDF points.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/pageMetadata"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "pageMetadata": {
+      "title": "Page Metadata",
+      "description": "Identifies one PDF page and its expected dimensions.",
+      "type": "object",
+      "required": [
+        "pageNumber",
+        "widthPt",
+        "heightPt"
+      ],
+      "properties": {
+        "pageNumber": {
+          "description": "One-based page number.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "widthPt": {
+          "description": "Expected visible page width in PDF points.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "heightPt": {
+          "description": "Expected visible page height in PDF points.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "dataContract": {
+      "title": "Data Contract",
+      "description": "Identifies the structure and version of the dataset referenced by field value sources.",
+      "type": "object",
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable, provider-independent identifier for the expected dataset structure.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "version": {
+          "description": "Major and minor version of the expected dataset structure.",
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coordinateSystem": {
+      "title": "Coordinate System",
+      "description": "Declares how field positions and page numbers are represented in annotation version 1.0.",
+      "type": "object",
+      "required": [
+        "unit",
+        "origin",
+        "pageNumbering"
+      ],
+      "properties": {
+        "unit": {
+          "description": "Coordinates are stored as fractions of the page width and height.",
+          "const": "normalized"
+        },
+        "origin": {
+          "description": "The point (0, 0) is located at the top-left of the visible page.",
+          "const": "top-left"
+        },
+        "pageNumbering": {
+          "description": "The first page is numbered 1.",
+          "const": "one-based"
+        }
+      },
+      "additionalProperties": false
+    },
+    "normalizedBox": {
+      "title": "Normalized Box",
+      "description": "Defines a printable rectangle using fractions of the visible page width and height with a top-left origin.",
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "description": "Horizontal position of the rectangle's left edge as a fraction of page width.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "y": {
+          "description": "Vertical position of the rectangle's top edge as a fraction of page height.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "width": {
+          "description": "Rectangle width as a fraction of page width.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "height": {
+          "description": "Rectangle height as a fraction of page height.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "valueSource": {
+      "title": "Value Source",
+      "description": "Defines whether a printable value is resolved from the dataset or supplied as a literal constant.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/jsonPointerSource"
+        },
+        {
+          "$ref": "#/$defs/constantSource"
+        }
+      ]
+    },
+    "jsonPointerSource": {
+      "title": "JSON Pointer Source",
+      "description": "References a value in the external dataset using RFC 6901 JSON Pointer syntax.",
+      "type": "object",
+      "required": [
+        "kind",
+        "pointer"
+      ],
+      "properties": {
+        "kind": {
+          "const": "json-pointer"
+        },
+        "pointer": {
+          "description": "Absolute JSON Pointer beginning with a slash and using only valid tilde escape sequences.",
+          "type": "string",
+          "pattern": "^(?:/(?:[^~/]|~[01])*)+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "constantSource": {
+      "title": "Constant Source",
+      "description": "Supplies a literal primitive value that does not depend on the external dataset.",
+      "type": "object",
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "constant"
+        },
+        "value": {
+          "description": "Literal string, number, boolean, or null value to format and render.",
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldFormat": {
+      "title": "Field Format",
+      "description": "Defines the expected source value type and how that value becomes printable text or a mark.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/textFormat"
+        },
+        {
+          "$ref": "#/$defs/numberFormat"
+        },
+        {
+          "$ref": "#/$defs/moneyFormat"
+        },
+        {
+          "$ref": "#/$defs/dateFormat"
+        },
+        {
+          "$ref": "#/$defs/checkboxFormat"
+        },
+        {
+          "$ref": "#/$defs/percentageFormat"
+        },
+        {
+          "$ref": "#/$defs/maskedIdentifierFormat"
+        },
+        {
+          "$ref": "#/$defs/multilineTextFormat"
+        }
+      ]
+    },
+    "textFormat": {
+      "title": "Text Format",
+      "description": "Formats a JSON string as single-line text.",
+      "type": "object",
+      "required": [
+        "type",
+        "trim",
+        "case"
+      ],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "trim": {
+          "description": "Whether to remove leading and trailing whitespace before rendering.",
+          "type": "boolean"
+        },
+        "case": {
+          "description": "Letter-case transformation applied after trimming.",
+          "enum": [
+            "preserve",
+            "uppercase",
+            "lowercase",
+            "title-case"
+          ]
+        },
+        "prefix": {
+          "description": "Optional text added before the formatted value.",
+          "type": "string",
+          "default": ""
+        },
+        "suffix": {
+          "description": "Optional text added after the formatted value.",
+          "type": "string",
+          "default": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "numberFormat": {
+      "title": "Number Format",
+      "description": "Formats a JSON number without applying currency or percentage scaling.",
+      "type": "object",
+      "required": [
+        "type",
+        "decimalPlaces",
+        "useThousandsSeparator",
+        "negativeStyle"
+      ],
+      "properties": {
+        "type": {
+          "const": "number"
+        },
+        "decimalPlaces": {
+          "description": "Exact number of digits rendered after the decimal separator.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "useThousandsSeparator": {
+          "description": "Whether to group thousands in the rendered number.",
+          "type": "boolean"
+        },
+        "negativeStyle": {
+          "description": "How negative values are displayed.",
+          "enum": [
+            "minus",
+            "parentheses"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "moneyFormat": {
+      "title": "Money Format",
+      "description": "Formats a JSON number as a monetary amount.",
+      "type": "object",
+      "required": [
+        "type",
+        "decimalPlaces",
+        "useThousandsSeparator",
+        "showCurrencySymbol",
+        "currencySymbol",
+        "negativeStyle"
+      ],
+      "properties": {
+        "type": {
+          "const": "money"
+        },
+        "decimalPlaces": {
+          "description": "Exact number of digits rendered after the decimal separator.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "useThousandsSeparator": {
+          "description": "Whether to group thousands in the rendered amount.",
+          "type": "boolean"
+        },
+        "showCurrencySymbol": {
+          "description": "Whether to include currencySymbol in the rendered amount.",
+          "type": "boolean"
+        },
+        "currencySymbol": {
+          "description": "Symbol used when showCurrencySymbol is true.",
+          "type": "string",
+          "minLength": 1
+        },
+        "negativeStyle": {
+          "description": "How negative monetary values are displayed.",
+          "enum": [
+            "minus",
+            "parentheses"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "dateFormat": {
+      "title": "Date Format",
+      "description": "Formats an ISO calendar-date string without a time or time zone.",
+      "type": "object",
+      "required": [
+        "type",
+        "inputPattern",
+        "outputPattern"
+      ],
+      "properties": {
+        "type": {
+          "const": "date"
+        },
+        "inputPattern": {
+          "description": "Required date representation in the source dataset.",
+          "const": "YYYY-MM-DD"
+        },
+        "outputPattern": {
+          "description": "Supported representation used for the rendered date.",
+          "enum": [
+            "MM/DD/YYYY",
+            "MM-DD-YYYY",
+            "YYYY-MM-DD",
+            "MMDDYYYY"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "checkboxFormat": {
+      "title": "Checkbox Format",
+      "description": "Formats a JSON boolean as a printable checkbox mark.",
+      "type": "object",
+      "required": [
+        "type",
+        "trueMark",
+        "falseMark"
+      ],
+      "properties": {
+        "type": {
+          "const": "checkbox"
+        },
+        "trueMark": {
+          "description": "Text rendered when the source value is true.",
+          "type": "string",
+          "minLength": 1
+        },
+        "falseMark": {
+          "description": "Text rendered when the source value is false; an empty string leaves the box blank.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "percentageFormat": {
+      "title": "Percentage Format",
+      "description": "Formats a JSON number as a percentage with an explicit input scale.",
+      "type": "object",
+      "required": [
+        "type",
+        "inputScale",
+        "decimalPlaces",
+        "showPercentSymbol"
+      ],
+      "properties": {
+        "type": {
+          "const": "percentage"
+        },
+        "inputScale": {
+          "description": "Whether the source number is a fraction such as 0.125 or an already-scaled percent such as 12.5.",
+          "enum": [
+            "fraction",
+            "percent"
+          ]
+        },
+        "decimalPlaces": {
+          "description": "Exact number of digits rendered after the decimal separator.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "showPercentSymbol": {
+          "description": "Whether to append a percent symbol to the rendered value.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "maskedIdentifierFormat": {
+      "title": "Masked Identifier Format",
+      "description": "Inserts characters from a JSON string into a fixed identifier mask.",
+      "type": "object",
+      "required": [
+        "type",
+        "mask",
+        "placeholder"
+      ],
+      "properties": {
+        "type": {
+          "const": "masked-identifier"
+        },
+        "mask": {
+          "description": "Output mask containing literal separators and placeholder positions.",
+          "type": "string",
+          "minLength": 1
+        },
+        "placeholder": {
+          "description": "Single character in the mask that represents one source character.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "multilineTextFormat": {
+      "title": "Multiline Text Format",
+      "description": "Formats a JSON string for rendering across one or more lines.",
+      "type": "object",
+      "required": [
+        "type",
+        "preserveNewlines",
+        "maximumLines"
+      ],
+      "properties": {
+        "type": {
+          "const": "multiline-text"
+        },
+        "preserveNewlines": {
+          "description": "Whether newline characters in the source string force line breaks.",
+          "type": "boolean"
+        },
+        "maximumLines": {
+          "description": "Maximum number of lines available for the rendered value.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldStyleShape": {
+      "title": "Field Style Shape",
+      "description": "Defines the supported visual properties for a printable field.",
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "description": "Name of a font that the renderer can use or embed.",
+          "type": "string",
+          "minLength": 1
+        },
+        "fontSizePt": {
+          "description": "Preferred font size in PDF points.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "minimumFontSizePt": {
+          "description": "Smallest permitted font size when overflow behavior is shrink.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "horizontalAlign": {
+          "description": "Horizontal placement of content inside the printable box.",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "verticalAlign": {
+          "description": "Vertical placement of content inside the printable box.",
+          "enum": [
+            "top",
+            "middle",
+            "bottom"
+          ]
+        },
+        "paddingPt": {
+          "description": "Space in PDF points between content and the printable box edges.",
+          "type": "number",
+          "minimum": 0
+        },
+        "color": {
+          "description": "Text color as a six-digit hexadecimal RGB value.",
+          "type": "string",
+          "pattern": "^#[A-Fa-f0-9]{6}$"
+        },
+        "overflow": {
+          "description": "Action taken when rendered content does not fit inside the printable box.",
+          "enum": [
+            "shrink",
+            "clip",
+            "wrap",
+            "error"
+          ]
+        },
+        "rotationDegrees": {
+          "description": "Clockwise rotation applied to field content, independent of page rotation.",
+          "type": "number",
+          "minimum": -360,
+          "maximum": 360
+        },
+        "lineHeight": {
+          "description": "Line-height multiplier applied to the font size for multiline content.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldStyle": {
+      "title": "Complete Field Style",
+      "description": "Complete visual style required in document-level defaults.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/fieldStyleShape"
+        },
+        {
+          "required": [
+            "fontFamily",
+            "fontSizePt",
+            "minimumFontSizePt",
+            "horizontalAlign",
+            "verticalAlign",
+            "paddingPt",
+            "color",
+            "overflow",
+            "rotationDegrees",
+            "lineHeight"
+          ]
+        }
+      ]
+    },
+    "fieldStyleOverride": {
+      "title": "Field Style Override",
+      "description": "One or more field-specific visual properties that override document defaults.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/fieldStyleShape"
+        },
+        {
+          "minProperties": 1
+        }
+      ]
+    },
+    "fieldBehaviorShape": {
+      "title": "Field Behavior Shape",
+      "description": "Defines how missing, null, and numeric-zero values are handled.",
+      "type": "object",
+      "properties": {
+        "onMissing": {
+          "description": "Action taken when a JSON Pointer path does not exist in the dataset.",
+          "enum": [
+            "blank",
+            "warn",
+            "error"
+          ]
+        },
+        "onNull": {
+          "description": "Action taken when a source exists but resolves to JSON null.",
+          "enum": [
+            "blank",
+            "warn",
+            "error"
+          ]
+        },
+        "printZero": {
+          "description": "Whether numeric zero is rendered; this does not affect boolean false.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldBehavior": {
+      "title": "Complete Field Behavior",
+      "description": "Complete missing-value behavior required in document-level defaults.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/fieldBehaviorShape"
+        },
+        {
+          "required": [
+            "onMissing",
+            "onNull",
+            "printZero"
+          ]
+        }
+      ]
+    },
+    "fieldBehaviorOverride": {
+      "title": "Field Behavior Override",
+      "description": "One or more field-specific behavior properties that override document defaults.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/fieldBehaviorShape"
+        },
+        {
+          "minProperties": 1
+        }
+      ]
+    },
+    "annotationDefaults": {
+      "title": "Annotation Defaults",
+      "description": "Defines the complete style and missing-value behavior inherited by every field.",
+      "type": "object",
+      "required": [
+        "style",
+        "behavior"
+      ],
+      "properties": {
+        "style": {
+          "$ref": "#/$defs/fieldStyle"
+        },
+        "behavior": {
+          "$ref": "#/$defs/fieldBehavior"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldAnnotation": {
+      "title": "Field Annotation",
+      "description": "Defines the identity, source, position, formatting, and optional overrides for one printable value.",
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "page",
+        "source",
+        "box",
+        "format"
+      ],
+      "properties": {
+        "id": {
+          "description": "Unique, stable semantic identifier for the field within the annotation document.",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "Human-readable field name used by authoring tools and diagnostics.",
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "description": "Optional explanation of the field's tax-form meaning or authoring intent.",
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "description": "One-based number of the page on which the value is rendered.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "$ref": "#/$defs/valueSource"
+        },
+        "box": {
+          "$ref": "#/$defs/normalizedBox"
+        },
+        "format": {
+          "$ref": "#/$defs/fieldFormat"
+        },
+        "style": {
+          "$ref": "#/$defs/fieldStyleOverride"
+        },
+        "behavior": {
+          "$ref": "#/$defs/fieldBehaviorOverride"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

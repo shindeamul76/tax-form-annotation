@@ -1,0 +1,34 @@
+{
+  "dataContract": {
+    "id": "com.tax-form-annotator.taxpayer-return",
+    "version": "1.0"
+  },
+  "returns": {
+    "federal": {
+      "2025": {
+        "taxpayer": {
+          "identity": {
+            "legalName": {
+              "first": "Jordan",
+              "last": "Avery"
+            },
+            "ssn": "000000000"
+          },
+          "filingStatus": {
+            "single": true,
+            "marriedFilingJointly": false,
+            "marriedFilingSeparately": false,
+            "headOfHousehold": false,
+            "qualifyingSurvivingSpouse": false
+          }
+        },
+        "income": {
+          "wages": 60000
+        },
+        "summary": {
+          "amountOwed": 1250
+        }
+      }
+    }
+  }
+}

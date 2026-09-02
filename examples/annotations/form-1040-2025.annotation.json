@@ -1,0 +1,200 @@
+{
+  "annotationVersion": "1.0",
+  "form": {
+    "formId": "IRS-1040",
+    "title": "U.S. Individual Income Tax Return",
+    "taxYear": 2025,
+    "revision": "2025-final",
+    "templateFile": "f1040-2025.pdf",
+    "templateSha256": "3d31c226df0d189ced80e039d01cf0f8820c1019681a0f0ca6264de277b7e982",
+    "pages": [
+      {
+        "pageNumber": 1,
+        "widthPt": 612,
+        "heightPt": 792
+      },
+      {
+        "pageNumber": 2,
+        "widthPt": 612,
+        "heightPt": 792
+      }
+    ]
+  },
+  "dataContract": {
+    "id": "com.tax-form-annotator.taxpayer-return",
+    "version": "1.0"
+  },
+  "coordinateSystem": {
+    "unit": "normalized",
+    "origin": "top-left",
+    "pageNumbering": "one-based"
+  },
+  "defaults": {
+    "style": {
+      "fontFamily": "Helvetica",
+      "fontSizePt": 9,
+      "minimumFontSizePt": 6,
+      "horizontalAlign": "left",
+      "verticalAlign": "middle",
+      "paddingPt": 1,
+      "color": "#000000",
+      "overflow": "shrink",
+      "rotationDegrees": 0,
+      "lineHeight": 1.2
+    },
+    "behavior": {
+      "onMissing": "warn",
+      "onNull": "blank",
+      "printZero": false
+    }
+  },
+  "fields": [
+    {
+      "id": "form1040.taxpayer.firstName",
+      "label": "Taxpayer first name and middle initial",
+      "description": "The taxpayer's first name and optional middle initial on page 1.",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/legalName/first"
+      },
+      "box": {
+        "x": 0.058824,
+        "y": 0.118686,
+        "width": 0.351716,
+        "height": 0.017678
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.lastName",
+      "label": "Taxpayer last name",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/legalName/last"
+      },
+      "box": {
+        "x": 0.413399,
+        "y": 0.118686,
+        "width": 0.350082,
+        "height": 0.017678
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.ssn",
+      "label": "Taxpayer Social Security number",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/ssn"
+      },
+      "box": {
+        "x": 0.76634,
+        "y": 0.118686,
+        "width": 0.174837,
+        "height": 0.017678
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "###-##-####",
+        "placeholder": "#"
+      },
+      "style": {
+        "horizontalAlign": "center"
+      },
+      "behavior": {
+        "onMissing": "error"
+      }
+    },
+    {
+      "id": "form1040.filingStatus.single",
+      "label": "Single filing status",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/single"
+      },
+      "box": {
+        "x": 0.159475,
+        "y": 0.260101,
+        "width": 0.013072,
+        "height": 0.010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line1a.wages",
+      "label": "Line 1a wages",
+      "description": "Total amount from Form W-2, box 1.",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/wages"
+      },
+      "box": {
+        "x": 0.823529,
+        "y": 0.568182,
+        "width": 0.117647,
+        "height": 0.01515
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line37.amountOwed",
+      "label": "Line 37 amount owed",
+      "description": "Amount owed after subtracting line 33 from line 24.",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/summary/amountOwed"
+      },
+      "box": {
+        "x": 0.823529,
+        "y": 0.69697,
+        "width": 0.117647,
+        "height": 0.015153
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    }
+  ]
+}
