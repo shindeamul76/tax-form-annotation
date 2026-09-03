@@ -163,11 +163,17 @@ The following TypeScript describes the architectural shape. The final source typ
 ```ts
 type EditorState = {
   template: TemplateSession | null;
+  templateLoad: TemplateLoadState;
   draft: AnnotationDraft;
   sampleDataset: JsonValue | null;
   ui: EditorUiState;
   diagnostics: Diagnostic[];
   isDirty: boolean;
+};
+
+type TemplateLoadState = {
+  status: "idle" | "loading" | "ready" | "error";
+  errorMessage: string | null;
 };
 
 type TemplateSession = {
@@ -197,6 +203,7 @@ type DraftFieldAnnotation = {
   draftId: string;
   origin: "acroform" | "manual" | "imported-json";
   originalPdfFieldName?: string;
+  sourceFieldKind?: "text" | "checkbox" | "radio" | "choice" | "signature" | "button" | "unknown";
   mappingStatus: "unmapped" | "mapped" | "invalid";
   id?: string;
   label?: string;
@@ -215,7 +222,12 @@ type EditorUiState = {
   activeTool: "select" | "draw";
   selectedDraftId: string | null;
   pendingSelection: ScreenBox | null;
+  pendingFieldTransform: {
+    draftId: string;
+    box: NormalizedBox;
+  } | null;
   previewEnabled: boolean;
+  showDetectedFields: boolean;
 };
 ```
 
@@ -230,6 +242,8 @@ The exported `FieldAnnotation` type is separate and strict. It requires every pr
 ### 6.2 Runtime values versus exported values
 
 `TemplateSession.bytes`, UI state, `draftId`, import origin, original PDF names, and diagnostics exist only during editing. The exporter does not serialize them.
+
+The active `PdfTemplateDocument` adapter is also runtime-only. It remains outside the reducer because it is non-serializable; the reducer stores only its immutable template bytes and plain metadata.
 
 The final annotation receives template metadata, the checksum, and complete mapped fields from the draft.
 
@@ -250,8 +264,9 @@ A reducer applies explicit actions. Representative actions are:
 
 ```ts
 type EditorAction =
+  | { type: "template/loadStarted" }
   | { type: "template/loadSucceeded"; session: TemplateSession }
-  | { type: "template/loadFailed"; diagnostic: Diagnostic }
+  | { type: "template/loadFailed"; errorMessage: string }
   | { type: "fields/imported"; fields: DraftFieldAnnotation[] }
   | { type: "field/created"; field: DraftFieldAnnotation }
   | { type: "field/selected"; draftId: string | null }
@@ -264,7 +279,8 @@ type EditorAction =
   | { type: "annotation/imported"; draft: AnnotationDraft }
   | { type: "ui/pageChanged"; pageNumber: number }
   | { type: "ui/zoomChanged"; zoom: number }
-  | { type: "ui/toolChanged"; tool: "select" | "draw" };
+  | { type: "ui/toolChanged"; tool: "select" | "draw" }
+  | { type: "ui/pendingFieldTransformChanged"; transform: PendingFieldTransform | null };
 ```
 
 Reducer rules include:
@@ -306,7 +322,7 @@ Automatic import discovers locations. It does not automatically decide the JSON 
 
 1. Pointer-down starts a selection relative to the displayed page element.
 2. Pointer movement displays a temporary rectangle.
-3. Pointer-up clamps the rectangle to the page and ignores selections below a minimum usable size.
+3. Pointer-up clamps the rectangle to the page and ignores selections smaller than 6 CSS pixels in either dimension.
 4. The coordinate module converts CSS pixels to a normalized box:
 
 ```text
@@ -319,9 +335,20 @@ height = selectionHeightPx / displayedPageHeightPx
 5. The reducer adds an `unmapped` manual draft and selects it.
 6. The field inspector collects its semantic ID, label, source, format, style, and behavior.
 
+The page captures the active pointer so dragging may continue outside the page before the endpoint is clamped. `Escape`, `pointercancel`, or lost pointer capture removes the pending selection without creating a draft.
+
 Zoom changes only the displayed rectangle. It never rewrites the normalized box.
 
-### 8.4 Map a field
+### 8.4 Move or resize a field
+
+1. Pointer-down on a field starts a move; pointer-down on one of its eight handles starts a resize.
+2. The coordinate module converts the screen-pixel delta to normalized horizontal and vertical deltas.
+3. Movement is clamped while preserving the field's width and height.
+4. Resizing changes only the edges represented by the active handle, remains inside the page, and keeps a minimum size of 6 CSS pixels.
+5. Pointer movement stores a temporary `pendingFieldTransform` for immediate visual feedback. It does not modify the annotation draft or dirty state.
+6. Pointer-up commits one `field/boxChanged` action. `Escape`, `pointercancel`, or lost pointer capture discards the temporary transform.
+
+### 8.5 Map a field
 
 The field inspector edits:
 
@@ -332,7 +359,7 @@ The field inspector edits:
 
 When sample data is loaded, a pointer is resolved immediately. Missing paths and incompatible values appear as field diagnostics. They are not silently replaced with fabricated values.
 
-### 8.5 Preview
+### 8.6 Preview
 
 Preview uses the same source resolution, formatting, inheritance, and missing-value rules required by export:
 
@@ -344,7 +371,7 @@ Preview uses the same source resolution, formatting, inheritance, and missing-va
 
 The browser preview is an authoring aid. The generated PDF remains the authoritative check for exact font metrics and final placement.
 
-### 8.6 Export annotation JSON
+### 8.7 Export annotation JSON
 
 1. Convert the draft into a candidate strict annotation document.
 2. Validate it with `annotation.schema.json`.
@@ -356,7 +383,7 @@ The browser preview is an authoring aid. The generated PDF remains the authorita
 
 The exporter does not mutate editor state to make invalid fields appear valid.
 
-### 8.7 Generate a sample filled PDF
+### 8.8 Generate a sample filled PDF
 
 1. Require a valid annotation, loaded template, and sample dataset.
 2. Resolve and format fields in annotation array order.
@@ -494,7 +521,7 @@ Loads files, changes page/tool/zoom controls, starts validation, and triggers do
 
 ### `PdfWorkspace`
 
-Displays the current PDF page, existing rectangles, preview values, and the active manual selection. It translates pointer events into screen-box input but delegates normalization.
+Displays the current PDF page, existing rectangles, resize handles, preview values, and active pointer feedback. It translates pointer events into screen-pixel input but delegates normalization, movement, resizing, and clamping to the coordinate domain module.
 
 ### `FieldList`
 
@@ -622,7 +649,7 @@ Tests use generated or project-owned fixtures rather than depending on the netwo
 
 Component tests verify user-visible behavior:
 
-- Drawing and selecting a rectangle.
+- Drawing, selecting, moving, and resizing a rectangle.
 - Editing a field mapping.
 - Preserving alignment while zooming.
 - Showing pointer and validation errors.
@@ -692,4 +719,3 @@ The implementation is complete for the assignment when:
 - A sample filled PDF can be generated from the same annotation and dataset.
 - Automated tests pass.
 - Documentation and a walkthrough video explain the contract and demonstrate the workflow.
-

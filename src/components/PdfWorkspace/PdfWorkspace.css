@@ -1,0 +1,189 @@
+.pdf-scroll-region {
+  min-height: 48rem;
+  overflow: auto;
+  padding: 2rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(45deg, rgb(255 255 255 / 3%) 25%, transparent 25%) 0 0 / 18px
+      18px,
+    linear-gradient(-45deg, rgb(255 255 255 / 3%) 25%, transparent 25%) 0 0 /
+      18px 18px,
+    var(--workspace-bg);
+  box-shadow: var(--shadow-soft);
+}
+
+.pdf-page {
+  position: relative;
+  width: fit-content;
+  min-width: 12rem;
+  min-height: 16rem;
+  margin: 0 auto;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1.5rem 3.5rem rgb(12 22 18 / 25%);
+}
+
+.pdf-page canvas {
+  display: block;
+  max-width: none;
+}
+
+.pdf-page:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.pdf-page--draw {
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.pdf-page--select {
+  touch-action: none;
+  user-select: none;
+}
+
+.detected-field-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.detected-field {
+  position: absolute;
+  box-sizing: border-box;
+  min-width: 2px;
+  min-height: 2px;
+  border: 1.5px solid var(--field-border);
+  background: var(--field-fill);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 45%);
+}
+
+.pdf-page--select .detected-field {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.pdf-page--select .detected-field--selected {
+  cursor: move;
+}
+
+.detected-field--checkbox,
+.detected-field--radio {
+  border-color: var(--checkbox-border);
+  background: var(--checkbox-fill);
+}
+
+.detected-field--manual {
+  border-style: dashed;
+  border-color: var(--manual-field-border);
+  background: var(--manual-field-fill);
+}
+
+.detected-field--selected {
+  z-index: 1;
+  border-color: var(--selected-field-border);
+  background: var(--selected-field-fill);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 80%);
+}
+
+.field-resize-handle {
+  position: absolute;
+  z-index: 2;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--selected-field-border);
+  border-radius: 2px;
+  background: white;
+  box-shadow: 0 1px 2px rgb(12 22 18 / 20%);
+}
+
+.field-resize-handle--north-west {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+  transform: translate(-50%, -50%);
+}
+
+.field-resize-handle--north {
+  top: 0;
+  left: 50%;
+  cursor: ns-resize;
+  transform: translate(-50%, -50%);
+}
+
+.field-resize-handle--north-east {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+  transform: translate(50%, -50%);
+}
+
+.field-resize-handle--east {
+  top: 50%;
+  right: 0;
+  cursor: ew-resize;
+  transform: translate(50%, -50%);
+}
+
+.field-resize-handle--south-east {
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+  transform: translate(50%, 50%);
+}
+
+.field-resize-handle--south {
+  bottom: 0;
+  left: 50%;
+  cursor: ns-resize;
+  transform: translate(-50%, 50%);
+}
+
+.field-resize-handle--south-west {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+  transform: translate(-50%, 50%);
+}
+
+.field-resize-handle--west {
+  top: 50%;
+  left: 0;
+  cursor: ew-resize;
+  transform: translate(-50%, -50%);
+}
+
+.pending-field-selection {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 2px solid var(--pending-field-border);
+  background: var(--pending-field-fill);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 85%);
+}
+
+.pdf-render-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  color: var(--muted-text);
+  background: rgb(255 255 255 / 92%);
+  font-size: 0.875rem;
+}
+
+.pdf-render-message--error {
+  color: var(--danger-text);
+}
+
+@media (max-width: 760px) {
+  .pdf-scroll-region {
+    min-height: 34rem;
+    padding: 1rem;
+  }
+}
