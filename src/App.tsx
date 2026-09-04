@@ -3,11 +3,17 @@ import { createAcroFormDraftFields } from './app/create-acroform-drafts'
 import { createManualDraft } from './app/create-manual-draft'
 import type { LoadedPdfTemplate } from './app/load-pdf-template'
 import { usePdfTemplate } from './app/use-pdf-template'
+import { DataPreviewPanel } from './components/DataPreviewPanel/DataPreviewPanel'
+import { FieldInspector } from './components/FieldInspector/FieldInspector'
 import { PdfWorkspace } from './components/PdfWorkspace/PdfWorkspace'
 import type { NormalizedBox } from './domain/annotation-types'
+import { resolveRenderValuesForFields } from './domain/render-values'
+import { validateDatasetContract } from './domain/validation'
+import { parseJsonDataset } from './io/json-dataset'
 import { editorReducer } from './state/editor-reducer'
 import {
   selectCurrentPageFields,
+  selectPreviewFields,
   selectSelectedField,
 } from './state/editor-selectors'
 import { createInitialEditorState } from './state/editor-state'
@@ -16,6 +22,11 @@ import './App.css'
 const bundledTemplateFileName = 'f1040-2025.pdf'
 const bundledTemplateUrl = new URL(
   '../examples/templates/f1040-2025.pdf',
+  import.meta.url,
+).href
+const bundledDatasetFileName = 'sample-taxpayer-data.json'
+const bundledDatasetUrl = new URL(
+  '../examples/data/sample-taxpayer-data.json',
   import.meta.url,
 ).href
 
@@ -81,9 +92,79 @@ function App() {
     })
   }
 
+  const loadSampleDataset = async (
+    fileName: string,
+    readSourceText: () => Promise<string>,
+  ) => {
+    dispatch({ type: 'dataset/loadStarted' })
+
+    try {
+      const value = parseJsonDataset(await readSourceText())
+      dispatch({
+        type: 'dataset/loaded',
+        session: { fileName, value },
+      })
+    } catch (error: unknown) {
+      dispatch({
+        type: 'dataset/loadFailed',
+        errorMessage: getErrorMessage(error),
+      })
+    }
+  }
+
+  const handleBundledDatasetLoad = () => {
+    void loadSampleDataset(bundledDatasetFileName, async () => {
+      const response = await fetch(bundledDatasetUrl)
+
+      if (!response.ok) {
+        throw new Error('The included sample dataset could not be loaded.')
+      }
+
+      return response.text()
+    })
+  }
+
+  const handleDatasetFileSelected = (file: File) => {
+    void loadSampleDataset(file.name, () => file.text())
+  }
+
   const currentPage = editorState.ui.currentPage
   const currentPageFields = selectCurrentPageFields(editorState)
   const selectedField = selectSelectedField(editorState)
+  const previewFields = selectPreviewFields(editorState)
+  const datasetSession = editorState.sampleDataset.session
+  const isPreviewEnabled =
+    editorState.ui.previewEnabled &&
+    datasetSession !== null &&
+    previewFields.length > 0
+  const previewResult =
+    isPreviewEnabled && datasetSession !== null
+      ? resolveRenderValuesForFields(
+          previewFields,
+          editorState.draft.defaults,
+          datasetSession.value,
+        )
+      : { values: [], diagnostics: [], hasErrors: false }
+  const previewDiagnostics =
+    isPreviewEnabled && datasetSession !== null
+      ? [
+          ...validateDatasetContract(
+            editorState.draft.dataContract,
+            datasetSession.value,
+          ),
+          ...previewResult.diagnostics,
+        ]
+      : []
+  const currentPagePreviewValues = previewResult.values.filter(
+    (value) => value.page === currentPage,
+  )
+  const hasDuplicateSelectedId =
+    selectedField?.id !== undefined &&
+    editorState.draft.fields.some(
+      (field) =>
+        field.draftId !== selectedField.draftId &&
+        field.id === selectedField.id,
+    )
   const template = editorState.template
   const isLoading = editorState.templateLoad.status === 'loading'
   const pageCount = template?.pages.length ?? 0
@@ -274,6 +355,7 @@ function App() {
               activeTool={editorState.ui.activeTool}
               selectedDraftId={editorState.ui.selectedDraftId}
               pendingSelection={editorState.ui.pendingSelection}
+              previewValues={currentPagePreviewValues}
               showDetectedFields={editorState.ui.showDetectedFields}
               onFieldSelected={(draftId) =>
                 dispatch({ type: 'field/selected', draftId })
@@ -325,6 +407,20 @@ function App() {
                   </div>
                 </dl>
               </section>
+
+              <DataPreviewPanel
+                dataset={editorState.sampleDataset}
+                previewEnabled={isPreviewEnabled}
+                mappedFieldCount={previewFields.length}
+                renderedValueCount={previewResult.values.length}
+                diagnostics={previewDiagnostics}
+                onBundledSampleLoad={handleBundledDatasetLoad}
+                onFileSelected={handleDatasetFileSelected}
+                onPreviewChanged={(enabled) =>
+                  dispatch({ type: 'ui/previewChanged', enabled })
+                }
+                onClear={() => dispatch({ type: 'dataset/cleared' })}
+              />
 
               <section className="sidebar-card">
                 <div className="sidebar-card__heading">
@@ -384,40 +480,49 @@ function App() {
                 )}
               </section>
 
-              {selectedField !== undefined ? (
-                <section className="sidebar-card selected-field-card">
-                  <div className="sidebar-card__heading">
-                    <h3>Selected draft</h3>
-                    <span className="field-kind">
-                      {selectedField.mappingStatus}
-                    </span>
-                  </div>
-                  <p title={selectedField.originalPdfFieldName}>
-                    {selectedField.originalPdfFieldName ?? selectedField.draftId}
-                  </p>
-                  <p className="selected-field-hint">
-                    Drag the box to move it. Drag a handle to resize it.
-                  </p>
-                  <dl className="coordinate-facts">
-                    <div>
-                      <dt>x</dt>
-                      <dd>{formatCoordinate(selectedField.box.x)}</dd>
-                    </div>
-                    <div>
-                      <dt>y</dt>
-                      <dd>{formatCoordinate(selectedField.box.y)}</dd>
-                    </div>
-                    <div>
-                      <dt>width</dt>
-                      <dd>{formatCoordinate(selectedField.box.width)}</dd>
-                    </div>
-                    <div>
-                      <dt>height</dt>
-                      <dd>{formatCoordinate(selectedField.box.height)}</dd>
-                    </div>
-                  </dl>
-                </section>
-              ) : null}
+              {selectedField === undefined ? null : (
+                <FieldInspector
+                  key={selectedField.draftId}
+                  field={selectedField}
+                  defaultStyle={editorState.draft.defaults.style}
+                  defaultBehavior={editorState.draft.defaults.behavior}
+                  hasDuplicateId={hasDuplicateSelectedId}
+                  onMappingChanged={(mapping) =>
+                    dispatch({
+                      type: 'field/mappingChanged',
+                      draftId: selectedField.draftId,
+                      mapping,
+                    })
+                  }
+                  onBoxChanged={(box) =>
+                    dispatch({
+                      type: 'field/boxChanged',
+                      draftId: selectedField.draftId,
+                      box,
+                    })
+                  }
+                  onStyleChanged={(style) =>
+                    dispatch({
+                      type: 'field/styleChanged',
+                      draftId: selectedField.draftId,
+                      style,
+                    })
+                  }
+                  onBehaviorChanged={(behavior) =>
+                    dispatch({
+                      type: 'field/behaviorChanged',
+                      draftId: selectedField.draftId,
+                      behavior,
+                    })
+                  }
+                  onRemove={() =>
+                    dispatch({
+                      type: 'field/removed',
+                      draftId: selectedField.draftId,
+                    })
+                  }
+                />
+              )}
 
               {importWarnings.length > 0 ? (
                 <section className="sidebar-card sidebar-card--warning">
@@ -440,8 +545,10 @@ function shortenChecksum(checksum: string): string {
   return `${checksum.slice(0, 10)}…${checksum.slice(-8)}`
 }
 
-function formatCoordinate(value: number): string {
-  return value.toFixed(4)
-}
-
 export default App
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'The sample dataset could not be loaded.'
+}

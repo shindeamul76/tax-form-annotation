@@ -78,6 +78,21 @@ export function selectHasIncompleteFields(state: EditorState): boolean {
   )
 }
 
+export function selectPreviewFields(state: EditorState): FieldAnnotation[] {
+  const fields: FieldAnnotation[] = []
+
+  for (const draftField of state.draft.fields) {
+    const displayedDraft = applyPendingFieldTransform(state, draftField)
+    const field = toStrictFieldAnnotation(displayedDraft)
+
+    if (field !== undefined) {
+      fields.push(field)
+    }
+  }
+
+  return fields
+}
+
 function toStrictFormMetadata(
   draftForm: DraftFormMetadata,
 ): FormMetadata | undefined {

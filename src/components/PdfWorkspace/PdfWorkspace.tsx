@@ -2,6 +2,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
@@ -18,6 +19,7 @@ import {
   type ScreenPointPx,
   type SizePx,
 } from '../../domain/coordinates'
+import type { RenderValue } from '../../domain/render-values'
 import type { PdfTemplateDocument } from '../../pdf/pdf-document'
 import type {
   EditorTool,
@@ -33,6 +35,7 @@ interface PdfWorkspaceProps {
   activeTool: EditorTool
   selectedDraftId: string | null
   pendingSelection: ScreenBoxPx | null
+  previewValues: RenderValue[]
   showDetectedFields: boolean
   onFieldSelected: (draftId: string | null) => void
   onPendingSelectionChanged: (selection: ScreenBoxPx | null) => void
@@ -91,6 +94,7 @@ export function PdfWorkspace({
   activeTool,
   selectedDraftId,
   pendingSelection,
+  previewValues,
   showDetectedFields,
   onFieldSelected,
   onPendingSelectionChanged,
@@ -328,6 +332,21 @@ export function PdfWorkspace({
       >
         <canvas ref={canvasRef} />
 
+        {renderStatus === 'ready' && previewValues.length > 0 ? (
+          <div className="preview-value-layer" aria-label="Resolved preview values">
+            {previewValues.map((value, index) => (
+              <span
+                className="preview-value"
+                key={`${value.fieldId}:${index}`}
+                title={`${value.fieldId}: ${value.text}`}
+                style={createPreviewValueStyle(value, zoom)}
+              >
+                {value.text}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
         {showDetectedFields && renderStatus === 'ready' ? (
           <div className="detected-field-layer" aria-hidden="true">
             {fields.map((field) => {
@@ -467,6 +486,53 @@ function areBoxesEqual(first: NormalizedBox, second: NormalizedBox): boolean {
     first.width === second.width &&
     first.height === second.height
   )
+}
+
+function createPreviewValueStyle(
+  value: RenderValue,
+  zoom: number,
+): CSSProperties {
+  return {
+    left: `${value.box.x * 100}%`,
+    top: `${value.box.y * 100}%`,
+    width: `${value.box.width * 100}%`,
+    height: `${value.box.height * 100}%`,
+    padding: `${value.style.paddingPt * zoom}px`,
+    justifyContent: toHorizontalFlexAlignment(value.style.horizontalAlign),
+    alignItems: toVerticalFlexAlignment(value.style.verticalAlign),
+    color: value.style.color,
+    fontFamily: value.style.fontFamily,
+    fontSize: `${value.style.fontSizePt * zoom}px`,
+    lineHeight: value.style.lineHeight,
+    overflowWrap: value.style.overflow === 'wrap' ? 'anywhere' : 'normal',
+    transform: `rotate(${value.style.rotationDegrees}deg)`,
+  }
+}
+
+function toHorizontalFlexAlignment(
+  alignment: RenderValue['style']['horizontalAlign'],
+): CSSProperties['justifyContent'] {
+  switch (alignment) {
+    case 'left':
+      return 'flex-start'
+    case 'center':
+      return 'center'
+    case 'right':
+      return 'flex-end'
+  }
+}
+
+function toVerticalFlexAlignment(
+  alignment: RenderValue['style']['verticalAlign'],
+): CSSProperties['alignItems'] {
+  switch (alignment) {
+    case 'top':
+      return 'flex-start'
+    case 'middle':
+      return 'center'
+    case 'bottom':
+      return 'flex-end'
+  }
 }
 
 function capturePointer(element: HTMLElement, pointerId: number): void {

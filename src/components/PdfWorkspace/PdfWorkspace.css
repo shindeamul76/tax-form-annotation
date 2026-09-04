@@ -47,8 +47,25 @@
 
 .detected-field-layer {
   position: absolute;
+  z-index: 2;
   inset: 0;
   pointer-events: none;
+}
+
+.preview-value-layer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.preview-value {
+  position: absolute;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: pre-wrap;
+  transform-origin: center;
 }
 
 .detected-field {
@@ -158,7 +175,7 @@
 
 .pending-field-selection {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   box-sizing: border-box;
   pointer-events: none;
   border: 2px solid var(--pending-field-border);

@@ -5,6 +5,7 @@ import {
   selectAnnotationCandidate,
   selectCurrentPageFields,
   selectHasIncompleteFields,
+  selectPreviewFields,
   selectSelectedField,
 } from './editor-selectors'
 import { createInitialEditorState } from './editor-state'
@@ -56,6 +57,30 @@ describe('editor selectors', () => {
     expect(selectCurrentPageFields(state)[0]?.box).toEqual(pendingBox)
     expect(selectSelectedField(state)?.box).toEqual(pendingBox)
     expect(state.draft.fields[0]?.box).toEqual(mappedField.box)
+  })
+
+  it('previews complete fields while leaving unfinished drafts out', () => {
+    const initialState = createInitialEditorState()
+    const state = {
+      ...initialState,
+      draft: {
+        ...initialState.draft,
+        fields: [
+          mappedField,
+          {
+            ...mappedField,
+            draftId: 'unmapped-field',
+            id: undefined,
+            mappingStatus: 'unmapped' as const,
+          },
+        ],
+      },
+    }
+
+    expect(selectPreviewFields(state)).toEqual([
+      expect.objectContaining({ id: mappedField.id }),
+    ])
+    expect(selectAnnotationCandidate(state)).toBeNull()
   })
 
   it('returns no strict candidate while form metadata is incomplete', () => {

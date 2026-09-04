@@ -4,7 +4,6 @@ import type {
   FieldBehavior,
   FieldFormat,
   FieldStyle,
-  JsonValue,
   NormalizedBox,
   ValueSource,
 } from '../domain/annotation-types'
@@ -17,6 +16,7 @@ import type { Diagnostic } from '../domain/diagnostics'
 import type {
   EditorTool,
   PendingFieldTransform,
+  SampleDatasetSession,
   TemplateSession,
 } from './editor-state'
 
@@ -61,7 +61,10 @@ export type EditorAction =
       behavior: Partial<FieldBehavior>
     }
   | { type: 'field/removed'; draftId: string }
-  | { type: 'dataset/loaded'; value: JsonValue }
+  | { type: 'dataset/loadStarted' }
+  | { type: 'dataset/loaded'; session: SampleDatasetSession }
+  | { type: 'dataset/loadFailed'; errorMessage: string }
+  | { type: 'dataset/cleared' }
   | { type: 'annotation/imported'; annotation: AnnotationDocument }
   | { type: 'ui/pageChanged'; pageNumber: number }
   | { type: 'ui/zoomChanged'; zoom: number }

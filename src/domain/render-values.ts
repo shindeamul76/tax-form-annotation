@@ -132,13 +132,25 @@ export function resolveRenderValues(
   annotation: AnnotationDocument,
   dataset: JsonValue,
 ): RenderValuesResult {
+  return resolveRenderValuesForFields(
+    annotation.fields,
+    annotation.defaults,
+    dataset,
+  )
+}
+
+export function resolveRenderValuesForFields(
+  fields: FieldAnnotation[],
+  defaults: AnnotationDefaults,
+  dataset: JsonValue,
+): RenderValuesResult {
   const values: RenderValue[] = []
   const diagnostics: Diagnostic[] = []
 
-  for (const field of annotation.fields) {
+  for (const field of fields) {
     const result = resolveRenderValue({
       field,
-      defaults: annotation.defaults,
+      defaults,
       dataset,
     })
 

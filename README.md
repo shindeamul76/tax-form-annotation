@@ -2,6 +2,17 @@
 
 A browser-based tool for defining, validating, previewing, and exporting annotations that map structured taxpayer values onto exact U.S. tax-form PDF templates.
 
+## Implemented workflow
+
+- Load a local PDF or the bundled 2025 Form 1040.
+- Import existing AcroForm widgets.
+- Draw, select, move, and resize normalized field boxes.
+- Map fields to RFC 6901 JSON Pointers or primitive constants.
+- Configure field formats, rendering overrides, and missing-value behavior.
+- Correct coordinates through pointer interaction or exact numeric inputs.
+- Load fictional sample JSON and preview formatted values over the PDF.
+- Review missing paths, incompatible values, and data-contract diagnostics.
+
 ## Requirements
 
 - Node.js 24 LTS is recommended; Node.js 22.13 or newer is required.

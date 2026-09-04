@@ -115,6 +115,44 @@ describe('editorReducer', () => {
     expect(state.draft.fields[0]?.mappingStatus).toBe('mapped')
   })
 
+  it('marks duplicate field IDs invalid until the conflict is resolved', () => {
+    const mappedField = createAnnotationDocument().fields[0]
+    let state = editorReducer(createInitialEditorState(), {
+      type: 'field/created',
+      field: {
+        ...mappedField,
+        draftId: 'first',
+        origin: 'manual',
+        mappingStatus: 'mapped',
+      },
+    })
+    state = editorReducer(state, {
+      type: 'field/created',
+      field: {
+        ...mappedField,
+        draftId: 'second',
+        origin: 'manual',
+        mappingStatus: 'mapped',
+      },
+    })
+
+    expect(state.draft.fields.map(({ mappingStatus }) => mappingStatus)).toEqual([
+      'invalid',
+      'invalid',
+    ])
+
+    state = editorReducer(state, {
+      type: 'field/mappingChanged',
+      draftId: 'second',
+      mapping: { id: 'taxpayer.lastName' },
+    })
+
+    expect(state.draft.fields.map(({ mappingStatus }) => mappingStatus)).toEqual([
+      'mapped',
+      'mapped',
+    ])
+  })
+
   it('updates and removes a field through explicit actions', () => {
     let state = editorReducer(createInitialEditorState(), {
       type: 'field/created',
@@ -196,6 +234,37 @@ describe('editorReducer', () => {
     })
 
     expect(nextState).toBe(state)
+  })
+
+  it('loads and clears a sample dataset without dirtying the annotation', () => {
+    let state = editorReducer(createInitialEditorState(), {
+      type: 'dataset/loadStarted',
+    })
+
+    expect(state.sampleDataset.status).toBe('loading')
+
+    state = editorReducer(state, {
+      type: 'dataset/loaded',
+      session: {
+        fileName: 'sample.json',
+        value: { wages: 60_000 },
+      },
+    })
+
+    expect(state.sampleDataset).toEqual({
+      status: 'ready',
+      session: {
+        fileName: 'sample.json',
+        value: { wages: 60_000 },
+      },
+      errorMessage: null,
+    })
+    expect(state.ui.previewEnabled).toBe(true)
+    expect(state.isDirty).toBe(false)
+
+    state = editorReducer(state, { type: 'dataset/cleared' })
+    expect(state.sampleDataset.session).toBeNull()
+    expect(state.ui.previewEnabled).toBe(false)
   })
 
   it('does not select a draft that is outside canonical state', () => {

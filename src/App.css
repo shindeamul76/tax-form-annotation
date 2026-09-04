@@ -405,31 +405,6 @@
   white-space: nowrap;
 }
 
-.coordinate-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin: 1rem 0 0;
-}
-
-.coordinate-facts div {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background: var(--accent-soft);
-}
-
-.coordinate-facts dt {
-  color: var(--muted-text);
-  font-size: 0.68rem;
-}
-
-.coordinate-facts dd {
-  margin: 0.1rem 0 0;
-  color: var(--heading-text);
-  font-family: var(--mono);
-  font-size: 0.72rem;
-}
-
 .field-kind {
   padding: 0.2rem 0.4rem;
   color: var(--accent-strong);

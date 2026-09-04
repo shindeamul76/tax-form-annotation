@@ -94,6 +94,10 @@ export function resolveJsonPointer(
   }
 }
 
+export function isValidJsonPointerSyntax(pointer: string): boolean {
+  return pointer.length > 0 && parseJsonPointer(pointer).status === 'parsed'
+}
+
 function parseJsonPointer(pointer: string): JsonPointerParseResult {
   if (pointer === '') {
     return { status: 'parsed', tokens: [] }

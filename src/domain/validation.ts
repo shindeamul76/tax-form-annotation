@@ -242,7 +242,7 @@ function isSupportedPageRotation(rotationDegrees: number): boolean {
   return normalizedRotation === 0
 }
 
-function validateDatasetContract(
+export function validateDatasetContract(
   expectedContract: DataContract,
   dataset: JsonValue,
 ): Diagnostic[] {

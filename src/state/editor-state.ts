@@ -8,6 +8,17 @@ export interface TemplateSession extends LoadedTemplateMetadata {
   bytes: Uint8Array
 }
 
+export interface SampleDatasetSession {
+  fileName: string
+  value: JsonValue
+}
+
+export interface SampleDatasetState {
+  status: 'idle' | 'loading' | 'ready' | 'error'
+  session: SampleDatasetSession | null
+  errorMessage: string | null
+}
+
 export type TemplateLoadStatus = 'idle' | 'loading' | 'ready' | 'error'
 
 export interface TemplateLoadState {
@@ -37,7 +48,7 @@ export interface EditorState {
   template: TemplateSession | null
   templateLoad: TemplateLoadState
   draft: AnnotationDraft
-  sampleDataset: JsonValue | null
+  sampleDataset: SampleDatasetState
   ui: EditorUiState
   diagnostics: Diagnostic[]
   isDirty: boolean
@@ -88,7 +99,11 @@ export function createInitialEditorState(): EditorState {
       },
       fields: [],
     },
-    sampleDataset: null,
+    sampleDataset: {
+      status: 'idle',
+      session: null,
+      errorMessage: null,
+    },
     ui: {
       currentPage: 1,
       zoom: 1.1,

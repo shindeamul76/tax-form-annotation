@@ -32,6 +32,7 @@ describe('PdfWorkspace', () => {
         activeTool="select"
         selectedDraftId={field.draftId}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={onFieldSelected}
         onPendingSelectionChanged={vi.fn()}
@@ -75,6 +76,7 @@ describe('PdfWorkspace', () => {
         activeTool="select"
         selectedDraftId={null}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={vi.fn()}
@@ -87,6 +89,58 @@ describe('PdfWorkspace', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'PDF page 1 could not be rendered.',
     )
+  })
+
+  it('positions a formatted preview value inside its normalized box', async () => {
+    const { container } = render(
+      <PdfWorkspace
+        document={createReadyPdfDocument()}
+        pageNumber={1}
+        fields={[]}
+        zoom={1.25}
+        activeTool="select"
+        selectedDraftId={null}
+        pendingSelection={null}
+        previewValues={[
+          {
+            fieldId: 'form1040.line1a.wages',
+            page: 1,
+            text: '60,000',
+            box: { x: 0.7, y: 0.5, width: 0.2, height: 0.03 },
+            style: {
+              fontFamily: 'Helvetica',
+              fontSizePt: 8,
+              minimumFontSizePt: 6,
+              horizontalAlign: 'right',
+              verticalAlign: 'middle',
+              paddingPt: 1,
+              color: '#000000',
+              overflow: 'shrink',
+              rotationDegrees: 0,
+              lineHeight: 1.2,
+            },
+          },
+        ]}
+        showDetectedFields
+        onFieldSelected={vi.fn()}
+        onPendingSelectionChanged={vi.fn()}
+        onPendingFieldTransformChanged={vi.fn()}
+        onManualFieldCreated={vi.fn()}
+        onFieldBoxChanged={vi.fn()}
+      />,
+    )
+
+    const previewValue = await screen.findByText('60,000')
+    expect(previewValue).toHaveStyle({
+      left: '70%',
+      top: '50%',
+      width: '20%',
+      height: '3%',
+      fontSize: '10px',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    })
+    expect(container.querySelector('.preview-value-layer')).toBeInTheDocument()
   })
 
   it('converts a pointer drag into a normalized manual field box', async () => {
@@ -107,6 +161,7 @@ describe('PdfWorkspace', () => {
         activeTool="draw"
         selectedDraftId={null}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={onPendingSelectionChanged}
@@ -172,6 +227,7 @@ describe('PdfWorkspace', () => {
         activeTool="draw"
         selectedDraftId={null}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={onPendingSelectionChanged}
@@ -213,6 +269,7 @@ describe('PdfWorkspace', () => {
         activeTool="select"
         selectedDraftId={field.draftId}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={vi.fn()}
@@ -272,6 +329,7 @@ describe('PdfWorkspace', () => {
         activeTool="select"
         selectedDraftId={field.draftId}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={vi.fn()}
@@ -332,6 +390,7 @@ describe('PdfWorkspace', () => {
         activeTool="select"
         selectedDraftId={field.draftId}
         pendingSelection={null}
+        previewValues={[]}
         showDetectedFields
         onFieldSelected={vi.fn()}
         onPendingSelectionChanged={vi.fn()}

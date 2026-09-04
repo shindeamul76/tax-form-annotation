@@ -4,6 +4,8 @@ import type {
 } from '../domain/annotation-draft'
 import type { AnnotationDocument, ValueSource } from '../domain/annotation-types'
 import { isNormalizedBoxWithinPage } from '../domain/coordinates'
+import { isValidFieldFormat } from '../domain/field-format-validation'
+import { isValidJsonPointerSyntax } from '../domain/json-pointer'
 import type { EditorAction } from './editor-actions'
 import {
   MAXIMUM_EDITOR_ZOOM,
@@ -83,13 +85,7 @@ export function editorReducer(
     case 'field/boxChanged':
       return changeFieldBox(state, action.draftId, action.box)
     case 'field/mappingChanged':
-      return updateField(state, action.draftId, (field) => {
-        const updatedField = { ...field, ...action.mapping }
-        return {
-          ...updatedField,
-          mappingStatus: determineMappingStatus(updatedField),
-        }
-      })
+      return updateFieldMapping(state, action.draftId, action.mapping)
     case 'field/styleChanged':
       return updateField(state, action.draftId, (field) => ({
         ...field,
@@ -102,8 +98,44 @@ export function editorReducer(
       }))
     case 'field/removed':
       return removeField(state, action.draftId)
+    case 'dataset/loadStarted':
+      return {
+        ...state,
+        sampleDataset: {
+          ...state.sampleDataset,
+          status: 'loading',
+          errorMessage: null,
+        },
+      }
     case 'dataset/loaded':
-      return { ...state, sampleDataset: action.value }
+      return {
+        ...state,
+        sampleDataset: {
+          status: 'ready',
+          session: action.session,
+          errorMessage: null,
+        },
+        ui: { ...state.ui, previewEnabled: true },
+      }
+    case 'dataset/loadFailed':
+      return {
+        ...state,
+        sampleDataset: {
+          ...state.sampleDataset,
+          status: 'error',
+          errorMessage: action.errorMessage,
+        },
+      }
+    case 'dataset/cleared':
+      return {
+        ...state,
+        sampleDataset: {
+          status: 'idle',
+          session: null,
+          errorMessage: null,
+        },
+        ui: { ...state.ui, previewEnabled: false },
+      }
     case 'annotation/imported':
       return importAnnotation(state, action.annotation)
     case 'ui/pageChanged':
@@ -173,7 +205,8 @@ export function determineMappingStatus(
     !isNonBlank(field.label) ||
     field.source === undefined ||
     field.format === undefined ||
-    !isValidDraftSource(field.source)
+    !isValidDraftSource(field.source) ||
+    !isValidFieldFormat(field.format)
   ) {
     return 'invalid'
   }
@@ -257,7 +290,10 @@ function importFields(
     ...state,
     draft: {
       ...state.draft,
-      fields: [...state.draft.fields, ...newFields],
+      fields: deriveDocumentMappingStatuses([
+        ...state.draft.fields,
+        ...newFields,
+      ]),
     },
     isDirty: true,
   }
@@ -271,16 +307,20 @@ function createField(
     return state
   }
 
-  const createdField = {
+  const createdField: DraftFieldAnnotation = {
     ...field,
     mappingStatus: determineMappingStatus(field),
   }
+  const fields = deriveDocumentMappingStatuses([
+    ...state.draft.fields,
+    createdField,
+  ])
 
   return {
     ...state,
     draft: {
       ...state.draft,
-      fields: [...state.draft.fields, createdField],
+      fields,
     },
     ui: {
       ...state.ui,
@@ -288,6 +328,32 @@ function createField(
       pendingFieldTransform: null,
     },
     isDirty: true,
+  }
+}
+
+function updateFieldMapping(
+  state: EditorState,
+  draftId: string,
+  mapping: Extract<EditorAction, { type: 'field/mappingChanged' }>['mapping'],
+): EditorState {
+  const updatedState = updateField(state, draftId, (field) => {
+    const updatedField = { ...field, ...mapping }
+    return {
+      ...updatedField,
+      mappingStatus: determineMappingStatus(updatedField),
+    }
+  })
+
+  if (updatedState === state) {
+    return state
+  }
+
+  return {
+    ...updatedState,
+    draft: {
+      ...updatedState.draft,
+      fields: deriveDocumentMappingStatuses(updatedState.draft.fields),
+    },
   }
 }
 
@@ -368,8 +434,8 @@ function changePendingFieldTransform(
 }
 
 function removeField(state: EditorState, draftId: string): EditorState {
-  const fields = state.draft.fields.filter(
-    (field) => field.draftId !== draftId,
+  const fields = deriveDocumentMappingStatuses(
+    state.draft.fields.filter((field) => field.draftId !== draftId),
   )
 
   if (fields.length === state.draft.fields.length) {
@@ -419,15 +485,17 @@ function importAnnotation(
   state: EditorState,
   annotation: AnnotationDocument,
 ): EditorState {
-  const fields: DraftFieldAnnotation[] = annotation.fields.map(
-    (field, fieldIndex) => ({
-      ...field,
-      draftId: `imported-json:${fieldIndex}:${field.id}`,
-      origin: 'imported-json',
-      mappingStatus: 'mapped',
-      style: field.style,
-      behavior: field.behavior,
-    }),
+  const fields = deriveDocumentMappingStatuses(
+    annotation.fields.map(
+      (field, fieldIndex): DraftFieldAnnotation => ({
+        ...field,
+        draftId: `imported-json:${fieldIndex}:${field.id}`,
+        origin: 'imported-json',
+        mappingStatus: 'mapped',
+        style: field.style,
+        behavior: field.behavior,
+      }),
+    ),
   )
 
   return {
@@ -474,7 +542,36 @@ function changePage(state: EditorState, pageNumber: number): EditorState {
 }
 
 function isValidDraftSource(source: ValueSource): boolean {
-  return source.kind === 'constant' || /^\/(?:[^~/]|~[01])*(?:\/(?:[^~/]|~[01])*)*$/.test(source.pointer)
+  return source.kind === 'constant'
+    ? typeof source.value !== 'number' || Number.isFinite(source.value)
+    : isValidJsonPointerSyntax(source.pointer)
+}
+
+function deriveDocumentMappingStatuses(
+  fields: DraftFieldAnnotation[],
+): DraftFieldAnnotation[] {
+  const baseStatuses = fields.map(determineMappingStatus)
+  const mappedIdCounts = new Map<string, number>()
+
+  for (const [fieldIndex, field] of fields.entries()) {
+    if (baseStatuses[fieldIndex] === 'mapped' && field.id !== undefined) {
+      mappedIdCounts.set(field.id, (mappedIdCounts.get(field.id) ?? 0) + 1)
+    }
+  }
+
+  return fields.map((field, fieldIndex) => {
+    const baseStatus = baseStatuses[fieldIndex]
+    const mappingStatus =
+      baseStatus === 'mapped' &&
+      field.id !== undefined &&
+      (mappedIdCounts.get(field.id) ?? 0) > 1
+        ? 'invalid'
+        : baseStatus
+
+    return field.mappingStatus === mappingStatus
+      ? field
+      : { ...field, mappingStatus }
+  })
 }
 
 function isNonBlank(value: string | undefined): value is string {

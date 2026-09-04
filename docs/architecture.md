@@ -165,7 +165,7 @@ type EditorState = {
   template: TemplateSession | null;
   templateLoad: TemplateLoadState;
   draft: AnnotationDraft;
-  sampleDataset: JsonValue | null;
+  sampleDataset: SampleDatasetState;
   ui: EditorUiState;
   diagnostics: Diagnostic[];
   isDirty: boolean;
@@ -181,6 +181,15 @@ type TemplateSession = {
   bytes: Uint8Array;
   sha256: string;
   pages: PageMetadata[];
+};
+
+type SampleDatasetState = {
+  status: "idle" | "loading" | "ready" | "error";
+  session: {
+    fileName: string;
+    value: JsonValue;
+  } | null;
+  errorMessage: string | null;
 };
 
 type PageMetadata = {
@@ -275,7 +284,10 @@ type EditorAction =
   | { type: "field/styleChanged"; draftId: string; style: Partial<FieldStyle> }
   | { type: "field/behaviorChanged"; draftId: string; behavior: Partial<FieldBehavior> }
   | { type: "field/removed"; draftId: string }
-  | { type: "dataset/loaded"; value: JsonValue }
+  | { type: "dataset/loadStarted" }
+  | { type: "dataset/loaded"; session: SampleDatasetSession }
+  | { type: "dataset/loadFailed"; errorMessage: string }
+  | { type: "dataset/cleared" }
   | { type: "annotation/imported"; draft: AnnotationDraft }
   | { type: "ui/pageChanged"; pageNumber: number }
   | { type: "ui/zoomChanged"; zoom: number }
@@ -287,7 +299,7 @@ Reducer rules include:
 
 - Loading a different template clears fields only after the user confirms losing incompatible work.
 - Imported fields are appended as `unmapped` drafts and remain distinguishable by `draftId`.
-- Updating a mapping recalculates its status instead of trusting a UI-provided status.
+- Updating a mapping recalculates its status instead of trusting a UI-provided status. Duplicate semantic IDs mark every conflicting field invalid.
 - Changing pages does not change normalized boxes.
 - Every content change marks the document dirty.
 - Reducers remain synchronous and free of file or PDF-library calls.
@@ -356,6 +368,8 @@ The field inspector edits:
 - JSON Pointer or constant source.
 - Format type and format-specific options.
 - Optional style and behavior overrides.
+- Exact normalized coordinates for keyboard-accessible correction.
+- Field removal after explicit confirmation.
 
 When sample data is loaded, a pointer is resolved immediately. Missing paths and incompatible values appear as field diagnostics. They are not silently replaced with fabricated values.
 
@@ -363,11 +377,12 @@ When sample data is loaded, a pointer is resolved immediately. Missing paths and
 
 Preview uses the same source resolution, formatting, inheritance, and missing-value rules required by export:
 
-1. Select fields for the displayed page.
-2. Resolve each field against the sample dataset.
-3. Produce a formatted display value or diagnostic.
-4. Convert its normalized box to CSS pixels.
-5. Render the value in an absolutely positioned overlay above the PDF canvas.
+1. Parse either the fictional bundled JSON or a local JSON file.
+2. Select complete mapped fields while leaving unfinished drafts editable and unrendered.
+3. Verify a supplied dataset contract and resolve each field source.
+4. Produce a formatted display value or diagnostic.
+5. Select values for the displayed page and convert their normalized boxes to CSS layout.
+6. Render each value in an absolutely positioned overlay above the PDF canvas.
 
 The browser preview is an authoring aid. The generated PDF remains the authoritative check for exact font metrics and final placement.
 
@@ -530,6 +545,10 @@ Lists fields on the document or current page, displays mapping status, and selec
 ### `FieldInspector`
 
 Edits the selected draft's semantic mapping, format, style, behavior, and rectangle values.
+
+### `DataPreviewPanel`
+
+Loads fictional sample JSON, controls preview visibility, reports mapped and rendered counts, and displays value-resolution diagnostics.
 
 ### `ValidationPanel`
 
