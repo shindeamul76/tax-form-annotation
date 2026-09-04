@@ -341,7 +341,11 @@ export function PdfWorkspace({
                 title={`${value.fieldId}: ${value.text}`}
                 style={createPreviewValueStyle(value, zoom)}
               >
-                {value.text}
+                {value.style.characterCells === undefined
+                  ? value.text
+                  : [...value.text].map((character, characterIndex) => (
+                      <span key={characterIndex}>{character}</span>
+                    ))}
               </span>
             ))}
           </div>
@@ -492,6 +496,17 @@ function createPreviewValueStyle(
   value: RenderValue,
   zoom: number,
 ): CSSProperties {
+  // A comb field divides the box into equal cells and centers one character in
+  // each, mirroring the PDF layout so the preview is not a different picture.
+  const combLayout: CSSProperties =
+    value.style.characterCells === undefined
+      ? {}
+      : {
+          display: 'grid',
+          gridTemplateColumns: `repeat(${value.style.characterCells}, 1fr)`,
+          justifyItems: 'center',
+        }
+
   return {
     left: `${value.box.x * 100}%`,
     top: `${value.box.y * 100}%`,
@@ -500,6 +515,7 @@ function createPreviewValueStyle(
     padding: `${value.style.paddingPt * zoom}px`,
     justifyContent: toHorizontalFlexAlignment(value.style.horizontalAlign),
     alignItems: toVerticalFlexAlignment(value.style.verticalAlign),
+    ...combLayout,
     color: value.style.color,
     fontFamily: value.style.fontFamily,
     fontSize: `${value.style.fontSizePt * zoom}px`,

@@ -1,8 +1,3 @@
-.data-preview-panel {
-  display: grid;
-  gap: 0.85rem;
-}
-
 .preview-load-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -10,9 +5,9 @@
 }
 
 .preview-load-button {
-  min-height: 2.35rem;
-  padding: 0.45rem;
-  font-size: 0.7rem;
+  min-height: 2rem;
+  padding: 0.35rem;
+  font-size: var(--fs-xs);
 }
 
 .preview-summary {
@@ -20,9 +15,10 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.6rem;
   align-items: center;
-  padding: 0.65rem;
-  border-radius: 0.6rem;
-  background: var(--accent-soft);
+  padding: 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
 }
 
 .preview-summary div {
@@ -32,63 +28,66 @@
 }
 
 .preview-summary span {
-  color: var(--muted-text);
-  font-size: 0.62rem;
+  color: var(--ink-3);
+  font-size: 0.625rem;
 }
 
 .preview-summary strong {
   overflow: hidden;
-  color: var(--heading-text);
-  font-size: 0.7rem;
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .preview-summary button {
   grid-column: 1 / -1;
-  padding: 0.35rem;
+  padding: 0.25rem 0;
   border: 0;
-  color: var(--accent-strong);
+  color: var(--accent);
   text-align: left;
   background: transparent;
-  font: inherit;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: var(--fs-xs);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .preview-error {
-  padding: 0.55rem;
-  border-radius: 0.5rem;
-  color: var(--danger-text) !important;
-  background: var(--danger-bg);
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--r-sm);
+  color: var(--danger) !important;
+  background: var(--danger-weak);
 }
 
 .preview-diagnostic-list {
   display: grid;
   max-height: 10rem;
-  gap: 0.4rem;
+  gap: 0.3rem;
   margin: 0;
   padding: 0;
   overflow: auto;
   list-style: none;
+  scrollbar-width: thin;
 }
 
 .preview-diagnostic {
-  padding: 0.45rem;
-  border-left: 3px solid var(--warning-border);
-  color: var(--body-text);
-  background: var(--warning-bg);
-  font-size: 0.67rem;
-  line-height: 1.4;
+  padding: 0.4rem 0.5rem;
+  border-left: 2px solid var(--warn-line);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  color: var(--ink-2);
+  background: var(--warn-weak);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
 }
 
 .preview-diagnostic--error {
-  border-color: var(--danger-border);
-  color: var(--danger-text);
-  background: var(--danger-bg);
+  border-color: var(--danger-line);
+  color: var(--danger);
+  background: var(--danger-weak);
 }
 
 .preview-diagnostic strong {
+  font-weight: 600;
   text-transform: capitalize;
 }

@@ -1,18 +1,15 @@
 .pdf-scroll-region {
-  min-height: 48rem;
+  min-height: 42rem;
+  max-height: calc(100vh - 1.5rem);
   overflow: auto;
-  padding: 2rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 1.25rem;
-  background:
-    linear-gradient(45deg, rgb(255 255 255 / 3%) 25%, transparent 25%) 0 0 / 18px
-      18px,
-    linear-gradient(-45deg, rgb(255 255 255 / 3%) 25%, transparent 25%) 0 0 /
-      18px 18px,
-    var(--workspace-bg);
-  box-shadow: var(--shadow-soft);
+  padding: 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--canvas);
 }
 
+/* The page is the only elevated surface in the app, so the document reads as
+   the subject and the surrounding chrome stays flat. */
 .pdf-page {
   position: relative;
   width: fit-content;
@@ -21,7 +18,7 @@
   margin: 0 auto;
   overflow: hidden;
   background: white;
-  box-shadow: 0 1.5rem 3.5rem rgb(12 22 18 / 25%);
+  box-shadow: var(--shadow-page);
 }
 
 .pdf-page canvas {
@@ -30,8 +27,8 @@
 }
 
 .pdf-page:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 4px;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .pdf-page--draw {
@@ -62,20 +59,23 @@
 .preview-value {
   position: absolute;
   display: flex;
-  box-sizing: border-box;
   overflow: hidden;
   white-space: pre-wrap;
   transform-origin: center;
 }
 
+/*
+ * Field boxes share one neutral treatment. Colour is reserved for selection so
+ * a page of widgets reads as a single layer instead of a legend. Field kind is
+ * already labelled in the sidebar list, where it can be read as text.
+ */
 .detected-field {
   position: absolute;
-  box-sizing: border-box;
   min-width: 2px;
   min-height: 2px;
-  border: 1.5px solid var(--field-border);
-  background: var(--field-fill);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 45%);
+  border: 1.25px solid var(--box);
+  background: var(--box-fill);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 55%);
 }
 
 .pdf-page--select .detected-field {
@@ -87,34 +87,26 @@
   cursor: move;
 }
 
-.detected-field--checkbox,
-.detected-field--radio {
-  border-color: var(--checkbox-border);
-  background: var(--checkbox-fill);
-}
-
+/* Hand-drawn boxes stay distinguishable by line style rather than hue. */
 .detected-field--manual {
   border-style: dashed;
-  border-color: var(--manual-field-border);
-  background: var(--manual-field-fill);
 }
 
 .detected-field--selected {
   z-index: 1;
-  border-color: var(--selected-field-border);
-  background: var(--selected-field-fill);
-  box-shadow: 0 0 0 2px rgb(255 255 255 / 80%);
+  border: 1.5px solid var(--box-selected);
+  background: var(--box-selected-fill);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 85%);
 }
 
 .field-resize-handle {
   position: absolute;
   z-index: 2;
-  width: 8px;
-  height: 8px;
-  border: 1px solid var(--selected-field-border);
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--box-selected);
   border-radius: 2px;
   background: white;
-  box-shadow: 0 1px 2px rgb(12 22 18 / 20%);
 }
 
 .field-resize-handle--north-west {
@@ -176,10 +168,9 @@
 .pending-field-selection {
   position: absolute;
   z-index: 3;
-  box-sizing: border-box;
   pointer-events: none;
-  border: 2px solid var(--pending-field-border);
-  background: var(--pending-field-fill);
+  border: 1.5px dashed var(--box-selected);
+  background: var(--box-selected-fill);
   box-shadow: 0 0 0 1px rgb(255 255 255 / 85%);
 }
 
@@ -189,18 +180,24 @@
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  color: var(--muted-text);
+  color: var(--ink-3);
   background: rgb(255 255 255 / 92%);
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
 
 .pdf-render-message--error {
-  color: var(--danger-text);
+  color: var(--danger);
+}
+
+@media (max-width: 1080px) {
+  .pdf-scroll-region {
+    max-height: none;
+  }
 }
 
 @media (max-width: 760px) {
   .pdf-scroll-region {
-    min-height: 34rem;
-    padding: 1rem;
+    min-height: 30rem;
+    padding: 0.75rem;
   }
 }

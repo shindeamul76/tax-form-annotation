@@ -157,6 +157,25 @@ describe('resolveRenderValue', () => {
     expect(defaults.style).toEqual(defaultStyle)
   })
 
+  it('preserves the multiline limit for output-specific layout', () => {
+    const field = createField({
+      source: { kind: 'constant', value: 'First line\nSecond line' },
+      format: {
+        type: 'multiline-text',
+        preserveNewlines: true,
+        maximumLines: 2,
+      },
+    })
+
+    expect(resolveRenderValue({ field, defaults, dataset })).toMatchObject({
+      status: 'ready',
+      value: {
+        text: 'First line\nSecond line',
+        maximumLines: 2,
+      },
+    })
+  })
+
   it.each([
     ['blank', 'skipped', undefined],
     ['warn', 'skipped', 'warning'],

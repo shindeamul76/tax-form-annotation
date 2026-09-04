@@ -1,22 +1,57 @@
-import { useCallback, useReducer, type ChangeEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from 'react'
 import { createAcroFormDraftFields } from './app/create-acroform-drafts'
 import { createManualDraft } from './app/create-manual-draft'
+import { evaluateAnnotationReadiness } from './app/evaluate-annotation-readiness'
+import { findKnownTemplateProfile } from './app/known-template-profiles'
 import type { LoadedPdfTemplate } from './app/load-pdf-template'
 import { usePdfTemplate } from './app/use-pdf-template'
+import { AnnotationDefaultsEditor } from './components/AnnotationDefaultsEditor/AnnotationDefaultsEditor'
 import { DataPreviewPanel } from './components/DataPreviewPanel/DataPreviewPanel'
+import { FieldMappingActions } from './components/FieldMappingActions/FieldMappingActions'
 import { FieldInspector } from './components/FieldInspector/FieldInspector'
+import {
+  FilledPdfPanel,
+  type FilledPdfStatus,
+} from './components/FilledPdfPanel/FilledPdfPanel'
+import { FormMetadataEditor } from './components/FormMetadataEditor/FormMetadataEditor'
 import { PdfWorkspace } from './components/PdfWorkspace/PdfWorkspace'
-import type { NormalizedBox } from './domain/annotation-types'
+import { ValidationPanel } from './components/ValidationPanel/ValidationPanel'
+import type {
+  AnnotationDocument,
+  NormalizedBox,
+} from './domain/annotation-types'
+import type { DraftFieldAnnotation } from './domain/annotation-draft'
+import type { Diagnostic } from './domain/diagnostics'
+import { findAutomaticFieldMappings } from './domain/field-auto-mapping'
 import { resolveRenderValuesForFields } from './domain/render-values'
 import { validateDatasetContract } from './domain/validation'
+import {
+  ANNOTATION_JSON_MIME_TYPE,
+  createAnnotationJsonFile,
+} from './io/annotation-json'
+import { downloadBlob } from './io/file-download'
 import { parseJsonDataset } from './io/json-dataset'
+import { createFormArtifactFileName } from './io/output-file-name'
 import { editorReducer } from './state/editor-reducer'
 import {
+  createAnnotationCandidate,
   selectCurrentPageFields,
   selectPreviewFields,
   selectSelectedField,
 } from './state/editor-selectors'
-import { createInitialEditorState } from './state/editor-state'
+import {
+  createInitialEditorState,
+  type SampleDatasetSession,
+  type TemplateSession,
+} from './state/editor-state'
 import './App.css'
 
 const bundledTemplateFileName = 'f1040-2025.pdf'
@@ -30,12 +65,35 @@ const bundledDatasetUrl = new URL(
   import.meta.url,
 ).href
 
+interface FilledPdfGenerationState {
+  status: FilledPdfStatus
+  diagnostics: Diagnostic[]
+  downloadedFileName: string | null
+  source: FilledPdfGenerationSource | null
+}
+
+interface FilledPdfGenerationSource {
+  annotation: AnnotationDocument
+  template: TemplateSession
+  dataset: SampleDatasetSession
+}
+
+const idleFilledPdfState: FilledPdfGenerationState = {
+  status: 'idle',
+  diagnostics: [],
+  downloadedFileName: null,
+  source: null,
+}
+
 function App() {
   const [editorState, dispatch] = useReducer(
     editorReducer,
     undefined,
     createInitialEditorState,
   )
+  const [filledPdfState, setFilledPdfState] =
+    useState<FilledPdfGenerationState>(idleFilledPdfState)
+  const filledPdfRequestIdRef = useRef(0)
 
   const handleLoadStarted = useCallback(() => {
     dispatch({ type: 'template/loadStarted' })
@@ -43,14 +101,38 @@ function App() {
 
   const handleLoadSucceeded = useCallback(
     (loadedTemplate: LoadedPdfTemplate) => {
+      const importedFields = createAcroFormDraftFields(
+        loadedTemplate.importedFields,
+      )
+      const knownProfile = findKnownTemplateProfile(
+        loadedTemplate.session.sha256,
+      )
+
       dispatch({
         type: 'template/loadSucceeded',
         session: loadedTemplate.session,
       })
       dispatch({
         type: 'fields/imported',
-        fields: createAcroFormDraftFields(loadedTemplate.importedFields),
+        fields: importedFields,
       })
+
+      if (knownProfile !== undefined) {
+        dispatch({
+          type: 'form/metadataChanged',
+          metadata: {
+            formId: knownProfile.form.formId,
+            title: knownProfile.form.title,
+            taxYear: knownProfile.form.taxYear,
+            revision: knownProfile.form.revision,
+          },
+        })
+        dispatch({
+          type: 'dataContract/changed',
+          dataContract: knownProfile.dataContract,
+        })
+      }
+
       dispatch({
         type: 'diagnostics/replaced',
         diagnostics: loadedTemplate.diagnostics,
@@ -133,6 +215,7 @@ function App() {
   const selectedField = selectSelectedField(editorState)
   const previewFields = selectPreviewFields(editorState)
   const datasetSession = editorState.sampleDataset.session
+  const template = editorState.template
   const isPreviewEnabled =
     editorState.ui.previewEnabled &&
     datasetSession !== null &&
@@ -158,6 +241,30 @@ function App() {
   const currentPagePreviewValues = previewResult.values.filter(
     (value) => value.page === currentPage,
   )
+  const knownTemplateProfile =
+    template === null ? undefined : findKnownTemplateProfile(template.sha256)
+  const automaticFieldMappings = useMemo(
+    () =>
+      knownTemplateProfile === undefined
+        ? []
+        : findAutomaticFieldMappings(
+            editorState.draft.fields,
+            knownTemplateProfile.fields,
+          ),
+    [editorState.draft.fields, knownTemplateProfile],
+  )
+  const mappingCounts = countFieldsByMappingStatus(editorState.draft.fields)
+  const isAutomaticMappingDatasetCompatible =
+    knownTemplateProfile !== undefined &&
+    datasetSession !== null &&
+    editorState.draft.dataContract.id ===
+      knownTemplateProfile.dataContract.id &&
+    editorState.draft.dataContract.version ===
+      knownTemplateProfile.dataContract.version &&
+    !validateDatasetContract(
+      knownTemplateProfile.dataContract,
+      datasetSession.value,
+    ).some(({ severity }) => severity === 'error')
   const hasDuplicateSelectedId =
     selectedField?.id !== undefined &&
     editorState.draft.fields.some(
@@ -165,12 +272,177 @@ function App() {
         field.draftId !== selectedField.draftId &&
         field.id === selectedField.id,
     )
-  const template = editorState.template
+  const annotationCandidate = useMemo(
+    () => createAnnotationCandidate(editorState.draft),
+    [editorState.draft],
+  )
+  const annotationReadiness = useMemo(
+    () =>
+      evaluateAnnotationReadiness({
+        draft: editorState.draft,
+        candidate: annotationCandidate,
+        template: template ?? undefined,
+        dataset: datasetSession?.value,
+      }),
+    [annotationCandidate, datasetSession, editorState.draft, template],
+  )
+  const currentFilledPdfInputRef = useRef({
+    annotationCandidate,
+    datasetSession,
+    template,
+  })
+  useEffect(() => {
+    currentFilledPdfInputRef.current = {
+      annotationCandidate,
+      datasetSession,
+      template,
+    }
+    filledPdfRequestIdRef.current += 1
+  }, [annotationCandidate, datasetSession, template])
+  const displayedFilledPdfState = isCurrentFilledPdfState(
+    filledPdfState,
+    annotationCandidate,
+    template,
+    datasetSession,
+  )
+    ? filledPdfState
+    : idleFilledPdfState
   const isLoading = editorState.templateLoad.status === 'loading'
   const pageCount = template?.pages.length ?? 0
   const importWarnings = editorState.diagnostics.filter(
     ({ severity }) => severity === 'warning',
   )
+
+  const handleDiagnosticSelected = (diagnostic: Diagnostic) => {
+    if (diagnostic.page !== undefined) {
+      dispatch({ type: 'ui/pageChanged', pageNumber: diagnostic.page })
+    }
+
+    if (diagnostic.draftId !== undefined) {
+      dispatch({ type: 'field/selected', draftId: diagnostic.draftId })
+    }
+  }
+
+  const handleAutomaticFieldMapping = () => {
+    if (!isAutomaticMappingDatasetCompatible) {
+      return
+    }
+
+    dispatch({
+      type: 'fields/automaticallyMapped',
+      mappings: automaticFieldMappings,
+    })
+  }
+
+  const handleAnnotationExport = () => {
+    if (
+      !annotationReadiness.isExportReady ||
+      annotationReadiness.candidate === null
+    ) {
+      return
+    }
+
+    const annotationFile = createAnnotationJsonFile(
+      annotationReadiness.candidate,
+    )
+    downloadBlob(
+      new Blob([annotationFile.contents], {
+        type: ANNOTATION_JSON_MIME_TYPE,
+      }),
+      annotationFile.fileName,
+    )
+    dispatch({ type: 'editor/saved' })
+  }
+
+  const handleFilledPdfGeneration = async () => {
+    if (
+      !annotationReadiness.isExportReady ||
+      annotationReadiness.candidate === null ||
+      template === null ||
+      datasetSession === null
+    ) {
+      return
+    }
+
+    const requestId = filledPdfRequestIdRef.current + 1
+    filledPdfRequestIdRef.current = requestId
+    const source: FilledPdfGenerationSource = {
+      annotation: annotationReadiness.candidate,
+      template,
+      dataset: datasetSession,
+    }
+    setFilledPdfState({
+      status: 'generating',
+      diagnostics: [],
+      downloadedFileName: null,
+      source,
+    })
+
+    try {
+      const { generateFilledPdf } = await import(
+        './pdf/filled-pdf-renderer'
+      )
+      const result = await generateFilledPdf({
+        annotation: annotationReadiness.candidate,
+        templateBytes: template.bytes,
+        dataset: datasetSession.value,
+      })
+
+      if (
+        filledPdfRequestIdRef.current !== requestId ||
+        !isCurrentFilledPdfSource(source, currentFilledPdfInputRef.current)
+      ) {
+        return
+      }
+
+      if (result.status === 'error') {
+        setFilledPdfState({
+          status: 'error',
+          diagnostics: result.diagnostics,
+          downloadedFileName: null,
+          source,
+        })
+        return
+      }
+
+      const fileName = createFormArtifactFileName(
+        annotationReadiness.candidate.form,
+        'filled.pdf',
+      )
+      downloadBlob(
+        new Blob([copyUint8ArrayToArrayBuffer(result.bytes)], {
+          type: 'application/pdf',
+        }),
+        fileName,
+      )
+      setFilledPdfState({
+        status: 'ready',
+        diagnostics: result.diagnostics,
+        downloadedFileName: fileName,
+        source,
+      })
+    } catch {
+      if (
+        filledPdfRequestIdRef.current !== requestId ||
+        !isCurrentFilledPdfSource(source, currentFilledPdfInputRef.current)
+      ) {
+        return
+      }
+
+      setFilledPdfState({
+        status: 'error',
+        diagnostics: [
+          {
+            severity: 'error',
+            code: 'PDF_GENERATION_FAILED',
+            message: 'The filled PDF could not be generated.',
+          },
+        ],
+        downloadedFileName: null,
+        source,
+      })
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -346,6 +618,87 @@ function App() {
           </div>
 
           <div className="review-grid">
+            <nav className="field-rail" aria-label="Page fields">
+              <section className="sidebar-card">
+                <div className="sidebar-card__heading">
+                  <div>
+                    <h3>Page {currentPage} fields</h3>
+                    <p>{currentPageFields.length} drafts on this page</p>
+                  </div>
+                  <label className="toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={editorState.ui.showDetectedFields}
+                      onChange={(event) =>
+                        dispatch({
+                          type: 'ui/detectedFieldsChanged',
+                          visible: event.currentTarget.checked,
+                        })
+                      }
+                    />
+                    Show boxes
+                  </label>
+                </div>
+
+                <FieldMappingActions
+                  mappedFieldCount={mappingCounts.mapped}
+                  unmappedFieldCount={mappingCounts.unmapped}
+                  invalidFieldCount={mappingCounts.invalid}
+                  automaticMappingCount={automaticFieldMappings.length}
+                  hasKnownTemplateProfile={
+                    knownTemplateProfile !== undefined
+                  }
+                  hasDataset={datasetSession !== null}
+                  isDatasetCompatible={
+                    isAutomaticMappingDatasetCompatible
+                  }
+                  onAutoMap={handleAutomaticFieldMapping}
+                  onExcludeUnmapped={() =>
+                    dispatch({ type: 'fields/unmappedExcluded' })
+                  }
+                />
+
+                {currentPageFields.length === 0 ? (
+                  <p className="field-empty-message">
+                    This page has no importable AcroForm widgets. Manual drawing
+                    will be the fallback.
+                  </p>
+                ) : (
+                  <ol className="detected-field-list">
+                    {currentPageFields.map((field) => (
+                      <li key={field.draftId}>
+                        <button
+                          className="field-list-button"
+                          type="button"
+                          aria-pressed={
+                            editorState.ui.selectedDraftId === field.draftId
+                          }
+                          onClick={() =>
+                            dispatch({
+                              type: 'field/selected',
+                              draftId: field.draftId,
+                            })
+                          }
+                        >
+                          <span className="field-kind">
+                            {field.sourceFieldKind ?? field.origin}
+                          </span>
+                          <span
+                            title={field.originalPdfFieldName ?? field.draftId}
+                          >
+                            {field.label ??
+                              shortenFieldName(
+                                field.originalPdfFieldName ?? field.draftId,
+                              )}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            </nav>
+
             <PdfWorkspace
               key={`${template.sha256}:${currentPage}`}
               document={document}
@@ -408,6 +761,33 @@ function App() {
                 </dl>
               </section>
 
+              <FormMetadataEditor
+                form={editorState.draft.form}
+                dataContract={editorState.draft.dataContract}
+                onFormChanged={(metadata) =>
+                  dispatch({ type: 'form/metadataChanged', metadata })
+                }
+                onDataContractChanged={(dataContract) =>
+                  dispatch({ type: 'dataContract/changed', dataContract })
+                }
+              />
+
+              <AnnotationDefaultsEditor
+                defaults={editorState.draft.defaults}
+                onStyleChanged={(style) =>
+                  dispatch({ type: 'defaults/styleChanged', style })
+                }
+                onBehaviorChanged={(behavior) =>
+                  dispatch({ type: 'defaults/behaviorChanged', behavior })
+                }
+              />
+
+              <ValidationPanel
+                result={annotationReadiness}
+                onDiagnosticSelected={handleDiagnosticSelected}
+                onExport={handleAnnotationExport}
+              />
+
               <DataPreviewPanel
                 dataset={editorState.sampleDataset}
                 previewEnabled={isPreviewEnabled}
@@ -422,63 +802,18 @@ function App() {
                 onClear={() => dispatch({ type: 'dataset/cleared' })}
               />
 
-              <section className="sidebar-card">
-                <div className="sidebar-card__heading">
-                  <div>
-                    <h3>Page {currentPage} fields</h3>
-                    <p>{currentPageFields.length} drafts on this page</p>
-                  </div>
-                  <label className="toggle-label">
-                    <input
-                      type="checkbox"
-                      checked={editorState.ui.showDetectedFields}
-                      onChange={(event) =>
-                        dispatch({
-                          type: 'ui/detectedFieldsChanged',
-                          visible: event.currentTarget.checked,
-                        })
-                      }
-                    />
-                    Show boxes
-                  </label>
-                </div>
-
-                {currentPageFields.length === 0 ? (
-                  <p className="field-empty-message">
-                    This page has no importable AcroForm widgets. Manual drawing
-                    will be the fallback.
-                  </p>
-                ) : (
-                  <ol className="detected-field-list">
-                    {currentPageFields.map((field) => (
-                      <li key={field.draftId}>
-                        <button
-                          className="field-list-button"
-                          type="button"
-                          aria-pressed={
-                            editorState.ui.selectedDraftId === field.draftId
-                          }
-                          onClick={() =>
-                            dispatch({
-                              type: 'field/selected',
-                              draftId: field.draftId,
-                            })
-                          }
-                        >
-                          <span className="field-kind">
-                            {field.sourceFieldKind ?? field.origin}
-                          </span>
-                          <span
-                            title={field.originalPdfFieldName ?? field.draftId}
-                          >
-                            {field.originalPdfFieldName ?? field.draftId}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </section>
+              <FilledPdfPanel
+                status={displayedFilledPdfState.status}
+                canGenerate={
+                  annotationReadiness.isExportReady && datasetSession !== null
+                }
+                hasDataset={datasetSession !== null}
+                downloadedFileName={
+                  displayedFilledPdfState.downloadedFileName
+                }
+                diagnostics={displayedFilledPdfState.diagnostics}
+                onGenerate={() => void handleFilledPdfGeneration()}
+              />
 
               {selectedField === undefined ? null : (
                 <FieldInspector
@@ -541,8 +876,29 @@ function App() {
   )
 }
 
+/*
+ * AcroForm names share a long container prefix such as
+ * `topmostSubform[0].Page1[0].`, so a left-anchored list truncates every row to
+ * the same unreadable text. Only the trailing segment distinguishes one widget
+ * from another; the full name stays available as the row's title attribute.
+ */
+function shortenFieldName(fieldName: string): string {
+  const segments = fieldName.split('.')
+  return segments[segments.length - 1] || fieldName
+}
+
 function shortenChecksum(checksum: string): string {
   return `${checksum.slice(0, 10)}…${checksum.slice(-8)}`
+}
+
+function countFieldsByMappingStatus(fields: DraftFieldAnnotation[]) {
+  return fields.reduce(
+    (counts, field) => ({
+      ...counts,
+      [field.mappingStatus]: counts[field.mappingStatus] + 1,
+    }),
+    { mapped: 0, unmapped: 0, invalid: 0 },
+  )
 }
 
 export default App
@@ -551,4 +907,39 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error
     ? error.message
     : 'The sample dataset could not be loaded.'
+}
+
+function copyUint8ArrayToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength)
+  copy.set(bytes)
+  return copy.buffer
+}
+
+function isCurrentFilledPdfState(
+  state: FilledPdfGenerationState,
+  annotation: AnnotationDocument | null,
+  template: TemplateSession | null,
+  dataset: SampleDatasetSession | null,
+): boolean {
+  return (
+    state.source === null ||
+    (state.source.annotation === annotation &&
+      state.source.template === template &&
+      state.source.dataset === dataset)
+  )
+}
+
+function isCurrentFilledPdfSource(
+  source: FilledPdfGenerationSource,
+  currentInput: {
+    annotationCandidate: AnnotationDocument | null
+    template: TemplateSession | null
+    datasetSession: SampleDatasetSession | null
+  },
+): boolean {
+  return (
+    source.annotation === currentInput.annotationCandidate &&
+    source.template === currentInput.template &&
+    source.dataset === currentInput.datasetSession
+  )
 }

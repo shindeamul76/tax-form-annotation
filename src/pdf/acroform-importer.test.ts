@@ -72,3 +72,23 @@ describe('importAcroFormWidgets', () => {
     )
   })
 })
+
+describe('importAcroFormWidgets comb widgets', () => {
+  it('carries a comb widget cell count onto the imported field', () => {
+    const result = importAcroFormWidgets({
+      pages: [letterPage],
+      widgets: [{ ...textWidget, characterCells: 9 }],
+    })
+
+    expect(result.fields[0]).toMatchObject({ characterCells: 9 })
+  })
+
+  it('omits the cell count for an ordinary widget', () => {
+    const result = importAcroFormWidgets({
+      pages: [letterPage],
+      widgets: [textWidget],
+    })
+
+    expect(result.fields[0]).not.toHaveProperty('characterCells')
+  })
+})

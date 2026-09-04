@@ -15,6 +15,10 @@ import {
 import { isValidFieldFormat } from '../../domain/field-format-validation'
 import { isValidJsonPointerSyntax } from '../../domain/json-pointer'
 import type { DraftFieldMappingPatch } from '../../state/editor-actions'
+import {
+  RenderingStyleControls,
+  ValueBehaviorControls,
+} from '../RenderingControls/RenderingControls'
 import { FieldFormatEditor } from './FieldFormatEditor'
 import './FieldInspector.css'
 
@@ -221,131 +225,18 @@ export function FieldInspector({
       <details className="inspector-section inspector-disclosure">
         <summary>Rendering overrides</summary>
         <p>Editing a value creates a field-level override of the form default.</p>
-        <div className="inspector-grid">
-          <label>
-            Font family
-            <input
-              value={effectiveStyle.fontFamily}
-              onChange={(event) =>
-                onStyleChanged({ fontFamily: event.currentTarget.value })
-              }
-            />
-          </label>
-          <PositiveNumberControl
-            label="Font size (pt)"
-            value={effectiveStyle.fontSizePt}
-            onChange={(fontSizePt) => onStyleChanged({ fontSizePt })}
-          />
-          <PositiveNumberControl
-            label="Minimum size (pt)"
-            value={effectiveStyle.minimumFontSizePt}
-            onChange={(minimumFontSizePt) =>
-              onStyleChanged({ minimumFontSizePt })
-            }
-          />
-          <label>
-            Horizontal alignment
-            <select
-              value={effectiveStyle.horizontalAlign}
-              onChange={(event) =>
-                onStyleChanged({
-                  horizontalAlign: event.currentTarget
-                    .value as FieldStyle['horizontalAlign'],
-                })
-              }
-            >
-              <option value="left">Left</option>
-              <option value="center">Center</option>
-              <option value="right">Right</option>
-            </select>
-          </label>
-          <label>
-            Vertical alignment
-            <select
-              value={effectiveStyle.verticalAlign}
-              onChange={(event) =>
-                onStyleChanged({
-                  verticalAlign: event.currentTarget
-                    .value as FieldStyle['verticalAlign'],
-                })
-              }
-            >
-              <option value="top">Top</option>
-              <option value="middle">Middle</option>
-              <option value="bottom">Bottom</option>
-            </select>
-          </label>
-          <NonNegativeNumberControl
-            label="Padding (pt)"
-            value={effectiveStyle.paddingPt}
-            onChange={(paddingPt) => onStyleChanged({ paddingPt })}
-          />
-          <label>
-            Text color
-            <input
-              type="color"
-              value={effectiveStyle.color}
-              onChange={(event) =>
-                onStyleChanged({ color: event.currentTarget.value })
-              }
-            />
-          </label>
-          <label>
-            Overflow
-            <select
-              value={effectiveStyle.overflow}
-              onChange={(event) =>
-                onStyleChanged({
-                  overflow: event.currentTarget.value as FieldStyle['overflow'],
-                })
-              }
-            >
-              <option value="shrink">Shrink</option>
-              <option value="clip">Clip</option>
-              <option value="wrap">Wrap</option>
-              <option value="error">Error</option>
-            </select>
-          </label>
-          <NumberControl
-            label="Rotation (degrees)"
-            value={effectiveStyle.rotationDegrees}
-            minimum={-360}
-            maximum={360}
-            onChange={(rotationDegrees) => onStyleChanged({ rotationDegrees })}
-          />
-          <PositiveNumberControl
-            label="Line height"
-            value={effectiveStyle.lineHeight}
-            step={0.1}
-            onChange={(lineHeight) => onStyleChanged({ lineHeight })}
-          />
-        </div>
+        <RenderingStyleControls
+          style={effectiveStyle}
+          onChange={onStyleChanged}
+        />
       </details>
 
       <details className="inspector-section inspector-disclosure">
         <summary>Missing-value behavior</summary>
-        <div className="inspector-grid">
-          <MissingBehaviorControl
-            label="When missing"
-            value={effectiveBehavior.onMissing}
-            onChange={(onMissing) => onBehaviorChanged({ onMissing })}
-          />
-          <MissingBehaviorControl
-            label="When null"
-            value={effectiveBehavior.onNull}
-            onChange={(onNull) => onBehaviorChanged({ onNull })}
-          />
-          <label className="inspector-checkbox">
-            <input
-              type="checkbox"
-              checked={effectiveBehavior.printZero}
-              onChange={(event) =>
-                onBehaviorChanged({ printZero: event.currentTarget.checked })
-              }
-            />
-            Print numeric zero
-          </label>
-        </div>
+        <ValueBehaviorControls
+          behavior={effectiveBehavior}
+          onChange={onBehaviorChanged}
+        />
       </details>
 
       <button
@@ -524,88 +415,6 @@ function CoordinateInput({
           }
         }}
       />
-    </label>
-  )
-}
-
-interface NumberControlProps {
-  label: string
-  value: number
-  minimum?: number
-  maximum?: number
-  step?: number
-  onChange: (value: number) => void
-}
-
-function NumberControl({
-  label,
-  value,
-  minimum,
-  maximum,
-  step = 1,
-  onChange,
-}: NumberControlProps) {
-  return (
-    <label>
-      {label}
-      <input
-        type="number"
-        min={minimum}
-        max={maximum}
-        step={step}
-        value={value}
-        onChange={(event) => {
-          const nextValue = event.currentTarget.valueAsNumber
-
-          if (
-            Number.isFinite(nextValue) &&
-            (minimum === undefined || nextValue >= minimum) &&
-            (maximum === undefined || nextValue <= maximum)
-          ) {
-            onChange(nextValue)
-          }
-        }}
-      />
-    </label>
-  )
-}
-
-function PositiveNumberControl(
-  props: Omit<NumberControlProps, 'minimum'>,
-) {
-  return <NumberControl {...props} minimum={Number.EPSILON} />
-}
-
-function NonNegativeNumberControl(
-  props: Omit<NumberControlProps, 'minimum'>,
-) {
-  return <NumberControl {...props} minimum={0} />
-}
-
-interface MissingBehaviorControlProps {
-  label: string
-  value: FieldBehavior['onMissing']
-  onChange: (value: FieldBehavior['onMissing']) => void
-}
-
-function MissingBehaviorControl({
-  label,
-  value,
-  onChange,
-}: MissingBehaviorControlProps) {
-  return (
-    <label>
-      {label}
-      <select
-        value={value}
-        onChange={(event) =>
-          onChange(event.currentTarget.value as FieldBehavior['onMissing'])
-        }
-      >
-        <option value="blank">Leave blank</option>
-        <option value="warn">Warning</option>
-        <option value="error">Error</option>
-      </select>
     </label>
   )
 }

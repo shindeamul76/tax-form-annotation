@@ -69,7 +69,7 @@ Every printable value can be obtained through an RFC 6901 JSON Pointer or a prim
 
 ### A-08: A human confirms field meaning
 
-AcroForm field names and rectangles are treated as suggestions. A human annotator confirms each field's semantic ID, JSON Pointer, format, placement, and output behavior before export.
+AcroForm field names and rectangles are treated as suggestions. A verified profile for an exact template checksum may prefill semantic mappings, but a human annotator can inspect and correct each field's semantic ID, JSON Pointer, format, placement, and output behavior before export.
 
 The application does not assume that a PDF field name accurately describes an IRS line or matches the project's dataset.
 
@@ -133,9 +133,9 @@ The project does not capture legally binding signatures, verify taxpayer identit
 
 Version 1.0 can import existing AcroForm widgets and supports manual rectangle drawing. It does not detect empty boxes from page images or infer fields from visible labels.
 
-### L-05: No automatic semantic mapping
+### L-05: Automatic semantic mapping is profile-limited
 
-The application does not automatically decide that a PDF rectangle represents a specific IRS line or JSON Pointer. Such suggestions could be added later, but human confirmation would still be required.
+The application can automatically apply the six fictional sample mappings to the exact included 2025 Form 1040. It verifies the template SHA-256 checksum, data-contract compatibility, widget kind, page, and strong normalized-box overlap before applying a mapping. It does not infer semantics for arbitrary forms, revised templates, or unknown data contracts; those fields still require manual mapping and human confirmation.
 
 ### L-06: AcroForm import is best effort
 
@@ -266,4 +266,3 @@ Success for this assignment means demonstrating that:
 7. Independent renderer code can use that document to generate a sample filled PDF.
 
 It does not mean the application is ready to prepare, file, or legally validate a real tax return.
-

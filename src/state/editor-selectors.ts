@@ -1,4 +1,8 @@
-import type { DraftFieldAnnotation, DraftFormMetadata } from '../domain/annotation-draft'
+import type {
+  AnnotationDraft,
+  DraftFieldAnnotation,
+  DraftFormMetadata,
+} from '../domain/annotation-draft'
 import type {
   AnnotationDocument,
   FieldBehavior,
@@ -44,7 +48,13 @@ function applyPendingFieldTransform(
 export function selectAnnotationCandidate(
   state: EditorState,
 ): AnnotationDocument | null {
-  const form = toStrictFormMetadata(state.draft.form)
+  return createAnnotationCandidate(state.draft)
+}
+
+export function createAnnotationCandidate(
+  draft: AnnotationDraft,
+): AnnotationDocument | null {
+  const form = toStrictFormMetadata(draft.form)
 
   if (form === undefined) {
     return null
@@ -52,7 +62,7 @@ export function selectAnnotationCandidate(
 
   const fields: FieldAnnotation[] = []
 
-  for (const draftField of state.draft.fields) {
+  for (const draftField of draft.fields) {
     const field = toStrictFieldAnnotation(draftField)
 
     if (field === undefined) {
@@ -63,11 +73,11 @@ export function selectAnnotationCandidate(
   }
 
   return {
-    annotationVersion: state.draft.annotationVersion,
+    annotationVersion: draft.annotationVersion,
     form,
-    dataContract: state.draft.dataContract,
-    coordinateSystem: state.draft.coordinateSystem,
-    defaults: state.draft.defaults,
+    dataContract: draft.dataContract,
+    coordinateSystem: draft.coordinateSystem,
+    defaults: draft.defaults,
     fields,
   }
 }

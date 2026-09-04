@@ -1,0 +1,18 @@
+.metadata-input-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem;
+  gap: 0.6rem;
+}
+
+.metadata-wide-input {
+  grid-column: 1 / -1;
+}
+
+.metadata-contract-editor {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.metadata-contract-editor p {
+  margin-bottom: 0.6rem;
+}

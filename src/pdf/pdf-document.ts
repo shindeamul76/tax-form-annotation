@@ -24,6 +24,8 @@ export interface PdfWidget {
   pageNumber: number
   kind: PdfWidgetKind
   rectPt: TopLeftRectanglePt
+  // Present when the widget is a comb field, holding its declared cell count.
+  characterCells?: number
 }
 
 export interface RenderPdfPageInput {

@@ -573,14 +573,14 @@ Multiline fields use the field's `lineHeight`, vertical alignment, and overflow 
 | `paddingPt` | Number greater than or equal to zero. |
 | `color` | Six-digit hexadecimal RGB color. |
 | `overflow` | `shrink`, `clip`, `wrap`, or `error`. |
-| `rotationDegrees` | Number from `-360` through `360`. |
+| `rotationDegrees` | Clockwise rotation from `-360` through `360`, applied around the center of the padded content box. |
 | `lineHeight` | Positive multiplier applied to font size. |
 
 Overflow behavior:
 
 - `shrink`: Reduce font size no lower than `minimumFontSizePt`; error if the value still does not fit.
-- `clip`: Draw only the portion inside the box.
-- `wrap`: Wrap text within the box; intended for multiline text.
+- `clip`: Draw only the portion inside the padded content box and respect a multiline field's `maximumLines` limit.
+- `wrap`: Wrap text within the padded content box; intended for multiline text. Rendering fails if the wrapped result still exceeds the available height or `maximumLines`.
 - `error`: Stop rendering the field when it does not fit.
 
 ## 11. Missing-value behavior
@@ -684,13 +684,15 @@ The recommended workflow is:
 3. Import existing AcroForm widgets when available.
 4. Convert imported PDF rectangles into normalized top-left rectangles.
 5. Use manual click-and-drag selection when a field is absent or inaccurate.
-6. Assign a semantic ID, label, JSON Pointer, format, style, and behavior.
-7. Load fictional sample data.
-8. Preview and adjust every field.
-9. Validate the complete annotation.
-10. Export JSON and generate a sample completed PDF.
+6. Optionally apply a verified mapping profile for the exact template checksum and expected data contract.
+7. Assign or correct each retained field's semantic ID, label, JSON Pointer, format, style, and behavior.
+8. Exclude detected fields that are intentionally outside the annotation's scope.
+9. Load fictional sample data.
+10. Preview and adjust every retained field.
+11. Validate the complete annotation.
+12. Export JSON and generate a sample completed PDF.
 
-Automatic field discovery is an authoring convenience. It does not alter the exported specification and does not remove the requirement for human review.
+Automatic field discovery and profile-based mapping are authoring conveniences. They do not alter the exported specification and do not remove the requirement for human review. A profile match MUST verify the exact template identity and data-contract compatibility before suggesting semantic mappings.
 
 ## 16. Versioning and compatibility
 

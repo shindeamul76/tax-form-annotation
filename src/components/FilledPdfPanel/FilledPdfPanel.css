@@ -1,0 +1,73 @@
+.filled-pdf-panel {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.filled-pdf-success {
+  padding: 0.55rem;
+  overflow-wrap: anywhere;
+  border-radius: 0.5rem;
+  color: var(--success-text) !important;
+  background: var(--success-bg);
+}
+
+.filled-pdf-diagnostics {
+  display: grid;
+  max-height: 12rem;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.filled-pdf-diagnostics li {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.5rem;
+  border-left: 3px solid var(--danger-border);
+  border-radius: 0.4rem;
+  background: var(--danger-bg);
+}
+
+.filled-pdf-diagnostics li[data-severity='warning'] {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+}
+
+.filled-pdf-diagnostics strong {
+  color: var(--heading-text);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.filled-pdf-diagnostics span {
+  overflow-wrap: anywhere;
+  color: var(--muted-text);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+}
+
+.filled-pdf-button {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 0.55rem;
+  color: white;
+  background: var(--accent);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.filled-pdf-button:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.filled-pdf-button:disabled {
+  border-color: var(--border-strong);
+  color: var(--muted-text);
+  background: var(--accent-soft);
+  cursor: not-allowed;
+}

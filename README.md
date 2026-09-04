@@ -6,12 +6,19 @@ A browser-based tool for defining, validating, previewing, and exporting annotat
 
 - Load a local PDF or the bundled 2025 Form 1040.
 - Import existing AcroForm widgets.
+- Auto-map the six sample fields when the exact bundled template and compatible taxpayer-data contract are loaded.
+- Review or manually correct every suggested mapping, then exclude all remaining unmapped drafts in one confirmed action.
+- Enter exact form identity and data-contract metadata.
+- Configure document-wide rendering and missing-value defaults.
 - Draw, select, move, and resize normalized field boxes.
 - Map fields to RFC 6901 JSON Pointers or primitive constants.
 - Configure field formats, rendering overrides, and missing-value behavior.
 - Correct coordinates through pointer interaction or exact numeric inputs.
 - Load fictional sample JSON and preview formatted values over the PDF.
 - Review missing paths, incompatible values, and data-contract diagnostics.
+- Review layered draft, JSON Schema, and semantic export-readiness checks.
+- Download a validated, strict annotation JSON file.
+- Generate and download a sample filled PDF using the exact template.
 
 ## Requirements
 

@@ -78,6 +78,10 @@ export function editorReducer(
       }
     case 'fields/imported':
       return importFields(state, action.fields)
+    case 'fields/automaticallyMapped':
+      return applyAutomaticFieldMappings(state, action.mappings)
+    case 'fields/unmappedExcluded':
+      return excludeUnmappedFields(state)
     case 'field/created':
       return createField(state, action.field)
     case 'field/selected':
@@ -326,6 +330,96 @@ function createField(
       ...state.ui,
       selectedDraftId: createdField.draftId,
       pendingFieldTransform: null,
+    },
+    isDirty: true,
+  }
+}
+
+function applyAutomaticFieldMappings(
+  state: EditorState,
+  mappings: Extract<
+    EditorAction,
+    { type: 'fields/automaticallyMapped' }
+  >['mappings'],
+): EditorState {
+  const mappingsByDraftId = new Map(
+    mappings.map((mapping) => [mapping.draftId, mapping]),
+  )
+  let appliedMappingCount = 0
+  const fields = state.draft.fields.map((field) => {
+    const mapping = mappingsByDraftId.get(field.draftId)
+
+    if (mapping === undefined || field.mappingStatus !== 'unmapped') {
+      return field
+    }
+
+    appliedMappingCount += 1
+    const profileField = mapping.profileField
+
+    return {
+      ...field,
+      id: profileField.id,
+      label: profileField.label,
+      description: profileField.description,
+      /*
+       * A profile only applies to a checksum-identical template, so its box is
+       * the human-verified geometry for this exact file. AcroForm rectangles
+       * are suggestions and can be larger than the printed area they sit in,
+       * which misaligns comb cells against pre-printed separator ticks.
+       */
+      box: { ...profileField.box },
+      source: { ...profileField.source },
+      format: { ...profileField.format },
+      style: mergeOverrides(profileField.style, field.style),
+      behavior: mergeOverrides(profileField.behavior, field.behavior),
+    }
+  })
+
+  if (appliedMappingCount === 0) {
+    return state
+  }
+
+  return {
+    ...state,
+    draft: {
+      ...state.draft,
+      fields: deriveDocumentMappingStatuses(fields),
+    },
+    isDirty: true,
+  }
+}
+
+function excludeUnmappedFields(state: EditorState): EditorState {
+  const excludedDraftIds = new Set(
+    state.draft.fields
+      .filter(({ mappingStatus }) => mappingStatus === 'unmapped')
+      .map(({ draftId }) => draftId),
+  )
+
+  if (excludedDraftIds.size === 0) {
+    return state
+  }
+
+  return {
+    ...state,
+    draft: {
+      ...state.draft,
+      fields: state.draft.fields.filter(
+        ({ draftId }) => !excludedDraftIds.has(draftId),
+      ),
+    },
+    ui: {
+      ...state.ui,
+      selectedDraftId:
+        state.ui.selectedDraftId !== null &&
+        excludedDraftIds.has(state.ui.selectedDraftId)
+          ? null
+          : state.ui.selectedDraftId,
+      pendingFieldTransform:
+        state.ui.pendingFieldTransform !== null &&
+        excludedDraftIds.has(state.ui.pendingFieldTransform.draftId)
+          ? null
+          : state.ui.pendingFieldTransform,
     },
     isDirty: true,
   }
@@ -584,4 +678,15 @@ function clamp(value: number, minimum: number, maximum: number): number {
   }
 
   return Math.min(Math.max(value, minimum), maximum)
+}
+
+function mergeOverrides<Value extends object>(
+  profileOverride: Value | undefined,
+  existingOverride: Partial<Value> | undefined,
+): Value | Partial<Value> | undefined {
+  if (profileOverride === undefined && existingOverride === undefined) {
+    return undefined
+  }
+
+  return { ...profileOverride, ...existingOverride }
 }

@@ -99,18 +99,19 @@
         "pointer": "/returns/federal/2025/taxpayer/identity/ssn"
       },
       "box": {
-        "x": 0.76634,
+        "x": 0.764208,
         "y": 0.118686,
-        "width": 0.174837,
+        "width": 0.159912,
         "height": 0.017678
       },
       "format": {
         "type": "masked-identifier",
-        "mask": "###-##-####",
+        "mask": "#########",
         "placeholder": "#"
       },
       "style": {
-        "horizontalAlign": "center"
+        "horizontalAlign": "center",
+        "characterCells": 9
       },
       "behavior": {
         "onMissing": "error"

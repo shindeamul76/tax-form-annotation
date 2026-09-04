@@ -170,6 +170,13 @@ export interface FieldStyle {
   overflow: OverflowBehavior
   rotationDegrees: number
   lineHeight: number
+  /*
+   * Comb fields divide one box into equal cells and center a single character
+   * in each, which is how tax forms print the separator ticks inside SSN, EIN,
+   * and account-number boxes. Absent for ordinary fields, whose text is drawn
+   * as one run.
+   */
+  characterCells?: number
 }
 
 export type HorizontalAlignment = 'left' | 'center' | 'right'

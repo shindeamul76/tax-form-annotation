@@ -1,64 +1,13 @@
-.field-inspector {
-  display: grid;
-  gap: 1rem;
-}
-
-.field-inspector h4 {
-  margin: 0;
-  color: var(--heading-text);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .inspector-section {
   display: grid;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.field-inspector label {
-  display: grid;
-  gap: 0.3rem;
-  color: var(--muted-text);
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.field-inspector input,
-.field-inspector select,
-.field-inspector textarea {
-  width: 100%;
-  min-width: 0;
-  padding: 0.5rem 0.55rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 0.5rem;
-  color: var(--heading-text);
-  background: white;
-  font: inherit;
-  font-weight: 500;
-}
-
-.field-inspector input:focus,
-.field-inspector select:focus,
-.field-inspector textarea:focus {
-  border-color: var(--accent);
-  outline: 3px solid var(--focus-ring);
-}
-
-.field-inspector textarea {
-  resize: vertical;
-}
-
-.field-inspector input[type='color'] {
-  min-height: 2.25rem;
-  padding: 0.2rem;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
 }
 
 .required-marker {
-  color: var(--danger-text);
-  font-size: 0.62rem;
+  color: var(--danger);
+  font-size: 0.625rem;
   font-weight: 600;
 }
 
@@ -71,76 +20,52 @@
 .coordinate-input-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
 .inspector-checkbox {
   display: flex !important;
   align-items: center;
   align-self: end;
-  min-height: 2.25rem;
-  grid-template-columns: auto 1fr;
-}
-
-.inspector-checkbox input {
-  width: auto;
-  accent-color: var(--accent);
-}
-
-.mapping-valid-message {
-  padding: 0.55rem;
-  border-radius: 0.5rem;
-  color: var(--success-text) !important;
-  background: var(--success-bg);
-}
-
-.mapping-issue-list {
-  display: grid;
-  gap: 0.3rem;
-  margin: 0;
-  padding: 0.55rem 0.55rem 0.55rem 1.5rem;
-  border-radius: 0.5rem;
-  color: var(--danger-text);
-  background: var(--danger-bg);
-  font-size: 0.7rem;
-}
-
-.inspector-disclosure summary {
-  color: var(--heading-text);
-  font-size: 0.76rem;
-  font-weight: 750;
-  cursor: pointer;
+  min-height: 2rem;
+  gap: 0.4rem !important;
 }
 
 .inspector-disclosure[open] summary {
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.5rem;
 }
 
 .constant-null-message {
   align-self: end;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 .delete-field-button {
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--danger-border);
-  border-radius: 0.55rem;
-  color: var(--danger-text);
-  background: transparent;
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 750;
+  min-height: 2.125rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  color: var(--danger);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .delete-field-button:hover {
-  background: var(--danger-bg);
+  border-color: var(--danger-line);
+  background: var(--danger-weak);
 }
 
 .field-kind--invalid,
 .field-kind--unmapped {
-  color: var(--danger-text);
-  background: var(--danger-bg);
+  color: var(--danger);
+  background: var(--danger-weak);
+}
+
+.field-kind--mapped {
+  color: var(--accent);
+  background: var(--accent-weak);
 }
 
 @media (max-width: 420px) {

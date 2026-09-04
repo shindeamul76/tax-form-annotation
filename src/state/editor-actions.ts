@@ -13,6 +13,7 @@ import type {
 } from '../domain/annotation-draft'
 import type { ScreenBoxPx } from '../domain/coordinates'
 import type { Diagnostic } from '../domain/diagnostics'
+import type { AutomaticFieldMapping } from '../domain/field-auto-mapping'
 import type {
   EditorTool,
   PendingFieldTransform,
@@ -42,6 +43,8 @@ export type EditorAction =
   | { type: 'defaults/styleChanged'; style: Partial<FieldStyle> }
   | { type: 'defaults/behaviorChanged'; behavior: Partial<FieldBehavior> }
   | { type: 'fields/imported'; fields: DraftFieldAnnotation[] }
+  | { type: 'fields/automaticallyMapped'; mappings: AutomaticFieldMapping[] }
+  | { type: 'fields/unmappedExcluded' }
   | { type: 'field/created'; field: DraftFieldAnnotation }
   | { type: 'field/selected'; draftId: string | null }
   | { type: 'field/boxChanged'; draftId: string; box: NormalizedBox }

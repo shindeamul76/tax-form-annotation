@@ -14,8 +14,10 @@ Load PDF template
         |
         v
 Import AcroForm fields when available ----+
-                                           |
-Draw or correct rectangles manually -------+--> Map fields to dataset values
+                                           +--> Apply verified profile when available
+Draw or correct rectangles manually -------+                 |
+                                                             v
+                                              Review mappings and exclude unused fields
                                                         |
                                                         v
                                               Preview with sample data
@@ -36,6 +38,7 @@ The architecture prioritizes:
 - One canonical annotation state shared by import, editing, preview, and export.
 - Pure, testable domain rules that do not depend on React or a PDF library.
 - Exact template identification through tax year, page metadata, and SHA-256 checksum.
+- Conservative profile-based mapping that never overwrites manual or partially completed mappings.
 - Resolution-independent positioning with normalized, top-left coordinates.
 - Explicit incomplete states while editing and strict validation at export.
 - Local processing so fictional or sensitive sample data does not leave the browser.
@@ -276,7 +279,16 @@ type EditorAction =
   | { type: "template/loadStarted" }
   | { type: "template/loadSucceeded"; session: TemplateSession }
   | { type: "template/loadFailed"; errorMessage: string }
+  | {
+      type: "form/metadataChanged";
+      metadata: Partial<Pick<DraftFormMetadata, "formId" | "title" | "taxYear" | "revision">>;
+    }
+  | { type: "dataContract/changed"; dataContract: DataContract }
+  | { type: "defaults/styleChanged"; style: Partial<FieldStyle> }
+  | { type: "defaults/behaviorChanged"; behavior: Partial<FieldBehavior> }
   | { type: "fields/imported"; fields: DraftFieldAnnotation[] }
+  | { type: "fields/automaticallyMapped"; mappings: AutomaticFieldMapping[] }
+  | { type: "fields/unmappedExcluded" }
   | { type: "field/created"; field: DraftFieldAnnotation }
   | { type: "field/selected"; draftId: string | null }
   | { type: "field/boxChanged"; draftId: string; box: NormalizedBox }
@@ -299,6 +311,8 @@ Reducer rules include:
 
 - Loading a different template clears fields only after the user confirms losing incompatible work.
 - Imported fields are appended as `unmapped` drafts and remain distinguishable by `draftId`.
+- Verified profile mappings apply only to untouched `unmapped` AcroForm drafts; manually mapped and partially edited fields are never overwritten.
+- Bulk exclusion removes only `unmapped` drafts and preserves mapped or invalid work.
 - Updating a mapping recalculates its status instead of trusting a UI-provided status. Duplicate semantic IDs mark every conflicting field invalid.
 - Changing pages does not change normalized boxes.
 - Every content change marks the document dirty.
@@ -315,7 +329,8 @@ File loading, checksum calculation, PDF inspection, and PDF generation run in co
 3. The PDF.js adapter loads the document and reads page dimensions and rotation.
 4. The application rejects encrypted, unreadable, or nonzero-rotation templates in version 1.0.
 5. A `TemplateSession` is stored and form metadata is initialized.
-6. PDF.js renders only the visible page to a canvas.
+6. If the SHA-256 checksum identifies a registered template, its form identity and expected data contract prefill the still-editable metadata inputs.
+7. PDF.js renders only the visible page to a canvas.
 
 The original byte array remains unchanged and becomes the input to sample PDF generation.
 
@@ -326,9 +341,12 @@ The original byte array remains unchanged and becomes the input to sample PDF ge
 3. It converts each PDF rectangle through the PDF.js viewport into a top-left rectangle.
 4. It divides by viewport width and height to produce a normalized box.
 5. It creates an `unmapped` `DraftFieldAnnotation` with origin `acroform`.
-6. The human reviews the box and supplies semantic mapping and formatting.
+6. When the checksum identifies a known template, the application offers the corresponding verified mapping profile.
+7. The profile matcher requires the same page, a compatible widget kind, and at least `0.8` intersection-over-union between normalized boxes.
+8. It applies semantic IDs, JSON Pointers, formats, styles, and behaviors without replacing the PDF-extracted box.
+9. The human reviews and can correct every result before export.
 
-Automatic import discovers locations. It does not automatically decide the JSON Pointer or tax meaning.
+Automatic import discovers locations. Profile-based semantic mapping is available only for explicitly registered template checksums and compatible data contracts; it does not guess from opaque PDF names or visible text.
 
 ### 8.3 Draw a field manually
 
@@ -360,7 +378,31 @@ Zoom changes only the displayed rectangle. It never rewrites the normalized box.
 5. Pointer movement stores a temporary `pendingFieldTransform` for immediate visual feedback. It does not modify the annotation draft or dirty state.
 6. Pointer-up commits one `field/boxChanged` action. `Escape`, `pointercancel`, or lost pointer capture discards the temporary transform.
 
-### 8.5 Map a field
+### 8.5 Complete form metadata
+
+The form metadata editor records the identity of the exact tax-form revision:
+
+- `formId` is a stable machine-readable identifier, such as `IRS-1040`.
+- `title` is the human-readable form name.
+- `taxYear` identifies the tax year covered by the template.
+- `revision` distinguishes releases for the same form and tax year.
+- `dataContract.id` and `dataContract.version` identify the expected input JSON structure.
+
+These values are controlled inputs backed directly by the canonical draft. The editor validates them as the user types. The template filename, SHA-256 checksum, and page dimensions remain read-only because they are derived from the loaded PDF rather than supplied by the annotator.
+
+### 8.6 Configure annotation defaults
+
+Document defaults define the complete rendering style and missing-value behavior inherited by every field. The editor exposes font family and sizes, alignment, padding, color, overflow, rotation, line height, missing/null handling, and numeric-zero printing.
+
+Each edit dispatches a partial change that is merged into `draft.defaults`; it never replaces unrelated default properties. Shared rendering controls are used by both the defaults editor and field inspector. In the defaults editor they update the document-wide value, while in the field inspector they create an explicit field-level override. Preview and PDF generation resolve the effective value as:
+
+```text
+effective field setting = field override ?? document default
+```
+
+The defaults validator additionally rejects incompatible settings such as a minimum font size greater than the preferred font size.
+
+### 8.7 Map a field
 
 The field inspector edits:
 
@@ -373,7 +415,7 @@ The field inspector edits:
 
 When sample data is loaded, a pointer is resolved immediately. Missing paths and incompatible values appear as field diagnostics. They are not silently replaced with fabricated values.
 
-### 8.6 Preview
+### 8.8 Preview
 
 Preview uses the same source resolution, formatting, inheritance, and missing-value rules required by export:
 
@@ -386,7 +428,7 @@ Preview uses the same source resolution, formatting, inheritance, and missing-va
 
 The browser preview is an authoring aid. The generated PDF remains the authoritative check for exact font metrics and final placement.
 
-### 8.7 Export annotation JSON
+### 8.9 Export annotation JSON
 
 1. Convert the draft into a candidate strict annotation document.
 2. Validate it with `annotation.schema.json`.
@@ -394,21 +436,24 @@ The browser preview is an authoring aid. The generated PDF remains the authorita
 4. Stop when any error-severity diagnostic exists.
 5. Remove all editor-only properties.
 6. Serialize stable, readable JSON with two-space indentation and a trailing newline.
-7. Download the annotation file.
+7. Name the file `{sanitized-formId}-{taxYear}.annotation.json`.
+8. Download it through a temporary object URL and release that URL immediately after use.
 
-The exporter does not mutate editor state to make invalid fields appear valid.
+The exporter does not mutate editor state to make invalid fields appear valid. It never includes the sample dataset, PDF bytes, diagnostics, draft IDs, selection state, or import metadata. After the browser download is initiated successfully, the current draft is marked saved.
 
-### 8.8 Generate a sample filled PDF
+### 8.10 Generate a sample filled PDF
 
 1. Require a valid annotation, loaded template, and sample dataset.
 2. Resolve and format fields in annotation array order.
 3. Convert normalized boxes to PDF points.
 4. Measure values using the actual embedded PDF font.
 5. Apply padding, alignment, multiline layout, and overflow rules.
-6. Draw values into a copy of the original PDF bytes.
-7. Save only if no fatal diagnostics remain.
+6. Clip drawing to each padded content box and rotate clockwise around its center when requested.
+7. Draw values into a copy of the original PDF bytes.
+8. Save only if no fatal diagnostics remain.
+9. Download the result as `{sanitized-formId}-{taxYear}.filled.pdf`.
 
-The rendering pipeline is reused by tests and exposed through a single application service such as `generateFilledPdf`.
+The `pdf-text-layout` module performs testable layout without depending on `pdf-lib`. It measures with an injected font-metrics interface, uses a bounded binary search for shrink-to-fit, wraps long words by Unicode code point, and verifies rotated glyph bounds. The `filled-pdf-renderer` adapter embeds and caches PDF standard fonts, establishes clipping paths, draws positioned lines, and refuses to return partial bytes after a fatal diagnostic. The application loads this adapter dynamically so `pdf-lib` is excluded from the initial editor bundle.
 
 ## 9. Shared render pipeline
 
@@ -471,17 +516,21 @@ Unit tests cover corners, page edges, zoom changes, and round trips within a def
 
 ## 11. Validation architecture
 
-Validation has three stages.
+Validation is layered. File inputs first pass parse validation. Export readiness then runs three ordered gates: draft completeness, JSON Schema, and semantic checks. A failed gate prevents later gates from running against unsafe input; warning diagnostics do not block export.
 
 ### 11.1 Parse validation
 
 JSON parsing catches malformed input and reports the filename and parser message without exposing taxpayer values.
 
-### 11.2 Schema validation
+### 11.2 Draft completeness
 
-Ajv validates the public annotation shape against `schemas/annotation.schema.json`. Schema validation covers required properties, unions, enumerations, patterns, and numeric ranges.
+Draft validation reports unfinished form metadata, invalid defaults, missing templates or pages, missing fields, and unmapped or invalid field drafts. These diagnostics retain editor-only `draftId` and page information so the UI can navigate directly to a field.
 
-### 11.3 Semantic validation
+### 11.3 Schema validation
+
+Ajv validates the strict candidate against `schemas/annotation.schema.json`. Schema validation covers required properties, unions, enumerations, patterns, and numeric ranges. Library errors are converted at the boundary into project diagnostics with RFC 6901 paths.
+
+### 11.4 Semantic validation
 
 Pure domain functions validate rules that depend on multiple values or external context:
 
@@ -508,6 +557,8 @@ type Diagnostic = {
 ```
 
 Codes are stable and machine-readable, for example `FIELD_POINTER_MISSING`, `BOX_OUT_OF_BOUNDS`, and `TEMPLATE_CHECKSUM_MISMATCH`. Messages are concise and actionable.
+
+`evaluateAnnotationReadiness` owns the gate ordering and returns the strict candidate, stage statuses, diagnostics, and final `isExportReady` decision. The validation panel shows at most 20 diagnostics at once to remain usable on AcroForm PDFs containing hundreds of initially unmapped widgets.
 
 ## 12. JSON Pointer safety
 
@@ -542,17 +593,37 @@ Displays the current PDF page, existing rectangles, resize handles, preview valu
 
 Lists fields on the document or current page, displays mapping status, and selects a field.
 
+### `FieldMappingActions`
+
+Reports mapped, unmapped, and invalid counts; applies compatible verified profile mappings in one action; and excludes all remaining unmapped drafts after confirmation. Automatic mapping is disabled until sample data with a compatible contract is loaded. Bulk exclusion warns when it would also remove fields that still have supported profile mappings.
+
 ### `FieldInspector`
 
 Edits the selected draft's semantic mapping, format, style, behavior, and rectangle values.
+
+### `FormMetadataEditor`
+
+Edits form identity and data-contract metadata, reports incomplete values, and leaves PDF-derived template facts read-only.
+
+### `AnnotationDefaultsEditor`
+
+Edits the complete document-level rendering style and value behavior and reports incompatible default settings.
+
+### `RenderingControls`
+
+Provides the shared style and behavior inputs used for document defaults and field-level overrides.
 
 ### `DataPreviewPanel`
 
 Loads fictional sample JSON, controls preview visibility, reports mapped and rendered counts, and displays value-resolution diagnostics.
 
+### `FilledPdfPanel`
+
+Requires a valid annotation and loaded sample dataset, reports generation progress and PDF-only diagnostics, and triggers the filled-PDF download. A changed template, annotation, or dataset invalidates previously displayed generation results.
+
 ### `ValidationPanel`
 
-Groups diagnostics by severity and field. Selecting a diagnostic navigates to its page and field when possible.
+Shows each validation gate, error and warning counts, and the final export decision. Selecting an actionable diagnostic navigates to its page and field when possible. Its JSON download action remains disabled until the strict candidate passes every error-level gate.
 
 ### `JsonPreview`
 
@@ -574,14 +645,23 @@ tax-form-annotator/
 |   `-- output/
 |-- src/
 |   |-- app/
+|   |   `-- evaluate-annotation-readiness.ts
 |   |-- components/
 |   |   |-- PdfWorkspace/
 |   |   |-- FieldInspector/
+|   |   |-- FormMetadataEditor/
+|   |   |-- AnnotationDefaultsEditor/
+|   |   |-- RenderingControls/
+|   |   |-- DataPreviewPanel/
+|   |   |-- FilledPdfPanel/
 |   |   |-- FieldList/
 |   |   |-- Toolbar/
 |   |   |-- ValidationPanel/
 |   |   `-- JsonPreview/
 |   |-- domain/
+|   |   |-- annotation-draft-validation.ts
+|   |   |-- annotation-defaults-validation.ts
+|   |   |-- annotation-schema-validation.ts
 |   |   |-- annotation-types.ts
 |   |   |-- coordinates.ts
 |   |   |-- diagnostics.ts
@@ -598,11 +678,13 @@ tax-form-annotator/
 |   |   |-- pdf-document.ts
 |   |   |-- pdfjs-adapter.ts
 |   |   |-- acroform-importer.ts
+|   |   |-- pdf-text-layout.ts
 |   |   `-- filled-pdf-renderer.ts
 |   |-- io/
 |   |   |-- annotation-json.ts
-|   |   |-- dataset-json.ts
+|   |   |-- json-dataset.ts
 |   |   |-- file-download.ts
+|   |   |-- output-file-name.ts
 |   |   `-- sha256.ts
 |   `-- styles/
 |-- tests/
@@ -680,12 +762,14 @@ Before submission, run one complete path with the included Form 1040 example:
 
 1. Load the exact template.
 2. Import available PDF fields.
-3. Add or correct at least one manual field.
-4. Map representative text, money, and checkbox fields.
-5. Load fictional sample data.
-6. Preview and correct alignment.
-7. Export valid annotation JSON.
-8. Generate and visually inspect the sample filled PDF.
+3. Complete form identity and data-contract metadata.
+4. Configure and validate document-wide rendering defaults.
+5. Add or correct at least one manual field.
+6. Map representative text, money, and checkbox fields.
+7. Load fictional sample data.
+8. Preview and correct alignment.
+9. Export valid annotation JSON.
+10. Generate and visually inspect the sample filled PDF.
 
 ## 18. Performance boundaries
 
@@ -710,12 +794,12 @@ Precise rectangle drawing is pointer-oriented, but numeric box inputs provide a 
 
 ## 20. Architectural constraints and future extensions
 
-Version 1.0 intentionally excludes automatic semantic mapping, OCR, tax calculations, collaborative editing, and remote persistence.
+Version 1.0 intentionally limits automatic semantic mapping to registered exact-template profiles. It excludes open-ended semantic inference, OCR, tax calculations, collaborative editing, and remote persistence.
 
 The following can be added behind existing boundaries without changing the core annotation contract:
 
 - OCR-assisted rectangle suggestions through another importer adapter.
-- Suggested JSON Pointer mappings that still require human confirmation.
+- OCR- or model-assisted JSON Pointer suggestions for templates without a verified profile, still requiring human confirmation.
 - Additional PDF renderers implementing the same render-value contract.
 - Local autosave through a persistence adapter.
 - Support for rotated pages through an explicitly tested coordinate strategy.
@@ -729,6 +813,8 @@ The implementation is complete for the assignment when:
 
 - A PDF can be loaded and displayed.
 - Existing AcroForm widgets are imported when present.
+- A verified profile can map the representative Form 1040 fields without overwriting human work.
+- All remaining unmapped drafts can be excluded together while mapped and invalid drafts are preserved.
 - A user can create, move, resize, edit, and remove manual annotations.
 - Fields can be mapped to JSON Pointers or constant values.
 - The supported formats and missing-value behaviors work as specified.

@@ -11,6 +11,7 @@ export interface ImportedAcroFormField {
   page: number
   widgetKind: PdfWidgetKind
   box: NormalizedBox
+  characterCells?: number
 }
 
 export interface AcroFormImportResult {
@@ -68,6 +69,9 @@ export function importAcroFormWidgets({
       page: widget.pageNumber,
       widgetKind: widget.kind,
       box,
+      ...(widget.characterCells === undefined
+        ? {}
+        : { characterCells: widget.characterCells }),
     })
   }
 

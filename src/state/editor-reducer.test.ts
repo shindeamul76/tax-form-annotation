@@ -53,6 +53,57 @@ describe('editorReducer', () => {
     expect(state.isDirty).toBe(true)
   })
 
+  it('stores editable form and data-contract metadata in the canonical draft', () => {
+    let state = editorReducer(createInitialEditorState(), {
+      type: 'form/metadataChanged',
+      metadata: {
+        formId: 'IRS-1040',
+        title: 'U.S. Individual Income Tax Return',
+        taxYear: 2025,
+        revision: '2025-final',
+      },
+    })
+    state = editorReducer(state, {
+      type: 'dataContract/changed',
+      dataContract: { id: 'com.example.tax-return', version: '2.0' },
+    })
+
+    expect(state.draft.form).toMatchObject({
+      formId: 'IRS-1040',
+      title: 'U.S. Individual Income Tax Return',
+      taxYear: 2025,
+      revision: '2025-final',
+    })
+    expect(state.draft.dataContract).toEqual({
+      id: 'com.example.tax-return',
+      version: '2.0',
+    })
+    expect(state.isDirty).toBe(true)
+  })
+
+  it('merges annotation default changes without replacing sibling values', () => {
+    let state = editorReducer(createInitialEditorState(), {
+      type: 'defaults/styleChanged',
+      style: { fontFamily: 'Times-Roman', horizontalAlign: 'right' },
+    })
+    state = editorReducer(state, {
+      type: 'defaults/behaviorChanged',
+      behavior: { onMissing: 'error', printZero: true },
+    })
+
+    expect(state.draft.defaults.style).toMatchObject({
+      fontFamily: 'Times-Roman',
+      fontSizePt: 9,
+      horizontalAlign: 'right',
+    })
+    expect(state.draft.defaults.behavior).toEqual({
+      onMissing: 'error',
+      onNull: 'blank',
+      printZero: true,
+    })
+    expect(state.isDirty).toBe(true)
+  })
+
   it('preserves drafts for the same template and clears them for a new one', () => {
     let state = editorReducer(createInitialEditorState(), {
       type: 'template/loadSucceeded',
@@ -113,6 +164,126 @@ describe('editorReducer', () => {
     })
 
     expect(state.draft.fields[0]?.mappingStatus).toBe('mapped')
+  })
+
+  it('applies an automatic mapping including the verified profile box', () => {
+    let state = editorReducer(createInitialEditorState(), {
+      type: 'fields/imported',
+      fields: [
+        {
+          ...unmappedField,
+          style: { fontSizePt: 10 },
+        },
+      ],
+    })
+    // A narrower box than the detected widget, the way a comb field's verified
+    // geometry sits inside an oversized AcroForm rectangle.
+    const verifiedBox = { x: 0.11, y: 0.2, width: 0.27, height: 0.04 }
+    const profileField = {
+      ...createAnnotationDocument().fields[0],
+      box: verifiedBox,
+    }
+
+    state = editorReducer(state, {
+      type: 'fields/automaticallyMapped',
+      mappings: [
+        {
+          draftId: unmappedField.draftId,
+          profileField: {
+            ...profileField,
+            style: { horizontalAlign: 'center' },
+          },
+          overlapScore: 1,
+        },
+      ],
+    })
+
+    /*
+     * A profile is selected by template checksum, so its box is the verified
+     * geometry for this exact file. An AcroForm rectangle can be wider than the
+     * printed area it sits in, which misplaces comb cells, so the profile box
+     * wins over the detected one.
+     */
+    expect(state.draft.fields[0]).toMatchObject({
+      draftId: unmappedField.draftId,
+      origin: 'acroform',
+      box: profileField.box,
+      id: profileField.id,
+      source: profileField.source,
+      format: profileField.format,
+      style: { horizontalAlign: 'center', fontSizePt: 10 },
+      mappingStatus: 'mapped',
+    })
+    expect(state.draft.fields[0]?.box).toEqual(verifiedBox)
+    expect(state.draft.fields[0]?.box).not.toEqual(unmappedField.box)
+  })
+
+  it('keeps manual or invalid mappings when automatic mappings are applied', () => {
+    const invalidField: DraftFieldAnnotation = {
+      ...unmappedField,
+      id: 'custom.field',
+      mappingStatus: 'invalid',
+    }
+    const state = editorReducer(
+      {
+        ...createInitialEditorState(),
+        draft: {
+          ...createInitialEditorState().draft,
+          fields: [invalidField],
+        },
+      },
+      {
+        type: 'fields/automaticallyMapped',
+        mappings: [
+          {
+            draftId: invalidField.draftId,
+            profileField: createAnnotationDocument().fields[0],
+            overlapScore: 1,
+          },
+        ],
+      },
+    )
+
+    expect(state.draft.fields[0]).toBe(invalidField)
+  })
+
+  it('excludes all unmapped fields without deleting mapped or invalid work', () => {
+    const mappedField: DraftFieldAnnotation = {
+      ...createAnnotationDocument().fields[0],
+      draftId: 'mapped',
+      origin: 'manual',
+      mappingStatus: 'mapped',
+    }
+    const invalidField: DraftFieldAnnotation = {
+      ...unmappedField,
+      draftId: 'invalid',
+      id: 'partially-edited',
+      mappingStatus: 'invalid',
+    }
+    const initialState = createInitialEditorState()
+    const state = editorReducer(
+      {
+        ...initialState,
+        draft: {
+          ...initialState.draft,
+          fields: [unmappedField, mappedField, invalidField],
+        },
+        ui: {
+          ...initialState.ui,
+          selectedDraftId: unmappedField.draftId,
+          pendingFieldTransform: {
+            draftId: unmappedField.draftId,
+            box: unmappedField.box,
+          },
+        },
+      },
+      { type: 'fields/unmappedExcluded' },
+    )
+
+    expect(state.draft.fields).toEqual([mappedField, invalidField])
+    expect(state.ui.selectedDraftId).toBeNull()
+    expect(state.ui.pendingFieldTransform).toBeNull()
+    expect(state.isDirty).toBe(true)
   })
 
   it('marks duplicate field IDs invalid until the conflict is resolved', () => {

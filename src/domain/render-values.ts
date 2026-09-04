@@ -20,6 +20,7 @@ export interface RenderValue {
   text: string
   box: NormalizedBox
   style: FieldStyle
+  maximumLines?: number
 }
 
 export interface ResolveRenderValueInput {
@@ -124,6 +125,9 @@ export function resolveRenderValue({
       text: formatResult.text,
       box: field.box,
       style,
+      ...(field.format.type === 'multiline-text'
+        ? { maximumLines: field.format.maximumLines }
+        : {}),
     },
   }
 }

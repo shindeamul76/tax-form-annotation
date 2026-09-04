@@ -1,0 +1,19 @@
+.rendering-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.rendering-checkbox {
+  display: flex !important;
+  align-items: center;
+  align-self: end;
+  min-height: 2rem;
+  gap: 0.4rem !important;
+}
+
+@media (max-width: 420px) {
+  .rendering-controls-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -613,6 +613,11 @@
           "description": "Line-height multiplier applied to the font size for multiline content.",
           "type": "number",
           "exclusiveMinimum": 0
+        },
+        "characterCells": {
+          "description": "Number of equal-width comb cells the box is divided into. Each rendered character is centered in one cell, matching pre-printed separator ticks. Omit for ordinary fields drawn as a single text run.",
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false

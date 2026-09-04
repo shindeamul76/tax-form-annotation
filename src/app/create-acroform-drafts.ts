@@ -12,5 +12,10 @@ export function createAcroFormDraftFields(
     mappingStatus: 'unmapped',
     page: field.page,
     box: { ...field.box },
+    // A comb widget carries its own cell count, so an imported field keeps the
+    // layout the template already declares instead of losing it at import.
+    ...(field.characterCells === undefined
+      ? {}
+      : { style: { characterCells: field.characterCells } }),
   }))
 }

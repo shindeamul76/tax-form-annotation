@@ -28,6 +28,8 @@ interface PdfJsWidgetAnnotation {
   rect: [number, number, number, number]
   checkBox?: boolean
   radioButton?: boolean
+  comb?: boolean
+  maxLen?: number
 }
 
 export const pdfJsDocumentLoader: PdfDocumentLoader = {
@@ -228,12 +230,15 @@ async function readPageWidgets(
 
       const pdfId = annotation.id ?? `${pageNumber}-${annotationIndex}`
 
+      const characterCells = readCharacterCells(annotation)
+
       widgets.push({
         pdfId,
         fieldName: annotation.fieldName ?? `Unnamed PDF field ${pdfId}`,
         pageNumber,
         kind: classifyWidget(annotation),
         rectPt,
+        ...(characterCells === undefined ? {} : { characterCells }),
       })
     }
 
@@ -263,8 +268,27 @@ function isPdfJsWidgetAnnotation(
     (candidate.checkBox === undefined ||
       typeof candidate.checkBox === 'boolean') &&
     (candidate.radioButton === undefined ||
-      typeof candidate.radioButton === 'boolean')
+      typeof candidate.radioButton === 'boolean') &&
+    (candidate.comb === undefined || typeof candidate.comb === 'boolean') &&
+    (candidate.maxLen === undefined || typeof candidate.maxLen === 'number')
   )
+}
+
+/*
+ * A comb widget declares how many equal cells its box is divided into. Tax
+ * forms print separator ticks at those boundaries, so the cell count is needed
+ * to place characters between them rather than as one centered run.
+ */
+function readCharacterCells(
+  annotation: PdfJsWidgetAnnotation,
+): number | undefined {
+  if (annotation.comb !== true || annotation.maxLen === undefined) {
+    return undefined
+  }
+
+  return Number.isInteger(annotation.maxLen) && annotation.maxLen > 0
+    ? annotation.maxLen
+    : undefined
 }
 
 function classifyWidget(annotation: PdfJsWidgetAnnotation): PdfWidgetKind {
