@@ -88,7 +88,10 @@ GitHub Actions runs the same lint, test, example-validation, and production-buil
 - [Annotation specification](docs/specification.md)
 - [Architecture](docs/architecture.md)
 - [Assumptions and limitations](docs/assumptions-and-limitations.md)
+- [Enhancement roadmap](docs/enhancements.md)
 
 ## Video walkthrough
 
-Add the final Loom or other public walkthrough URL here before submitting the assessment.
+[Watch the technical-test walkthrough on Loom](https://www.loom.com/share/371c150bcf4346b3847131c7522346bb)
+
+Walkthrough details are also available in [video/README.md](video/README.md).
