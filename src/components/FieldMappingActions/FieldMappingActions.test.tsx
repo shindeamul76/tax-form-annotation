@@ -8,11 +8,11 @@ describe('FieldMappingActions', () => {
     renderActions({ onAutoMap })
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Auto-map 6 sample fields' }),
+      screen.getByRole('button', { name: 'Auto-map 111 sample fields' }),
     )
 
     expect(onAutoMap).toHaveBeenCalledOnce()
-    expect(screen.getByText('193')).toBeInTheDocument()
+    expect(screen.getByText('88')).toBeInTheDocument()
   })
 
   it('explains why automatic mapping is unavailable before data is loaded', () => {
@@ -24,7 +24,7 @@ describe('FieldMappingActions', () => {
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'Auto-map 6 sample fields' }),
+      screen.getByRole('button', { name: 'Auto-map 111 sample fields' }),
     ).toBeDisabled()
   })
 
@@ -35,16 +35,16 @@ describe('FieldMappingActions', () => {
       .mockReturnValue(true)
     renderActions({
       automaticMappingCount: 0,
-      mappedFieldCount: 6,
+      mappedFieldCount: 111,
       onExcludeUnmapped,
     })
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Exclude 193 unmapped fields' }),
+      screen.getByRole('button', { name: 'Exclude 88 unmapped fields' }),
     )
 
     expect(confirmExclusion).toHaveBeenCalledWith(
-      'Exclude all 193 unmapped fields from this annotation? Mapped and partially edited fields will be kept.',
+      'Exclude all 88 unmapped fields from this annotation? Mapped and partially edited fields will be kept.',
     )
     expect(onExcludeUnmapped).toHaveBeenCalledOnce()
   })
@@ -57,11 +57,11 @@ describe('FieldMappingActions', () => {
     renderActions({ onExcludeUnmapped })
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Exclude 193 unmapped fields' }),
+      screen.getByRole('button', { name: 'Exclude 88 unmapped fields' }),
     )
 
     expect(confirmExclusion).toHaveBeenCalledWith(
-      'Exclude all 193 unmapped fields from this annotation? Mapped and partially edited fields will be kept. 6 supported fields can still be auto-mapped and will also be excluded.',
+      'Exclude all 88 unmapped fields from this annotation? Mapped and partially edited fields will be kept. 111 supported fields can still be auto-mapped and will also be excluded.',
     )
     expect(onExcludeUnmapped).not.toHaveBeenCalled()
   })
@@ -83,9 +83,9 @@ function renderActions(overrides: ActionOverrides = {}) {
   return render(
     <FieldMappingActions
       mappedFieldCount={overrides.mappedFieldCount ?? 0}
-      unmappedFieldCount={overrides.unmappedFieldCount ?? 193}
+      unmappedFieldCount={overrides.unmappedFieldCount ?? 88}
       invalidFieldCount={overrides.invalidFieldCount ?? 0}
-      automaticMappingCount={overrides.automaticMappingCount ?? 6}
+      automaticMappingCount={overrides.automaticMappingCount ?? 111}
       hasKnownTemplateProfile={overrides.hasKnownTemplateProfile ?? true}
       hasDataset={overrides.hasDataset ?? true}
       isDatasetCompatible={overrides.isDatasetCompatible ?? true}

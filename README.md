@@ -6,7 +6,7 @@ A browser-based tool for defining, validating, previewing, and exporting annotat
 
 - Load a local PDF or the bundled 2025 Form 1040.
 - Import existing AcroForm widgets.
-- Auto-map the six sample fields when the exact bundled template and compatible taxpayer-data contract are loaded.
+- Auto-map 111 sample-data fields when the exact bundled template and compatible taxpayer-data contract are loaded.
 - Review or manually correct every suggested mapping, then exclude all remaining unmapped drafts in one confirmed action.
 - Enter exact form identity and data-contract metadata.
 - Configure document-wide rendering and missing-value defaults.
@@ -41,14 +41,20 @@ npm run lint
 npm test
 npm run validate:examples
 npm run build
+npm run generate:1040-profile
 ```
 
 - `npm run lint` checks JavaScript, TypeScript, and React code with ESLint.
 - `npm test` runs the Vitest suite once.
 - `npm run validate:examples` validates annotation examples against `schemas/annotation.schema.json`.
 - `npm run build` type-checks the project and produces the production bundle.
+- `npm run generate:1040-profile` rebuilds the bundled 2025 Form 1040 annotation from its verified PDF widgets and semantic mapping definitions.
 
 Use `npm run test:watch` for test-driven development and `npm run preview` to inspect a completed production build locally.
+
+## Automated quality checks
+
+GitHub Actions runs the same lint, test, example-validation, and production-build commands on every push and pull request. A failed check appears on the repository's **Actions** tab and on the related commit or pull request.
 
 ## Documentation
 

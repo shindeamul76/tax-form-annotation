@@ -88,8 +88,8 @@ describe('Form 1040 demo export workflow', () => {
       dataset,
     })
 
-    expect(mappings).toHaveLength(6)
-    expect(state.draft.fields).toHaveLength(6)
+    expect(mappings).toHaveLength(111)
+    expect(state.draft.fields).toHaveLength(111)
     expect(readiness.diagnostics).toEqual([])
     expect(readiness.isExportReady).toBe(true)
   })

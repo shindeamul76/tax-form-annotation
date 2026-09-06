@@ -135,7 +135,7 @@ Version 1.0 can import existing AcroForm widgets and supports manual rectangle d
 
 ### L-05: Automatic semantic mapping is profile-limited
 
-The application can automatically apply the six fictional sample mappings to the exact included 2025 Form 1040. It verifies the template SHA-256 checksum, data-contract compatibility, widget kind, page, and strong normalized-box overlap before applying a mapping. It does not infer semantics for arbitrary forms, revised templates, or unknown data contracts; those fields still require manual mapping and human confirmation.
+The application can automatically apply 111 fictional sample-data mappings to the exact included 2025 Form 1040. These mappings cover the sample contract's printable identity, address, filing-status, dependent, income, deduction, tax, payment, refund, designee, signature-contact, and paid-preparer values. It verifies the template SHA-256 checksum, data-contract compatibility, widget kind, page, and strong normalized-box overlap before applying a mapping. Administrative widgets and values absent from the sample contract remain available for manual mapping or bulk exclusion. The application does not infer semantics for arbitrary forms, revised templates, or unknown data contracts.
 
 ### L-06: AcroForm import is best effort
 

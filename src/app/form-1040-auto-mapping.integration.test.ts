@@ -16,7 +16,7 @@ const FORM_1040_2025_SHA256 =
   '3d31c226df0d189ced80e039d01cf0f8820c1019681a0f0ca6264de277b7e982'
 
 describe('included Form 1040 automatic mapping', () => {
-  it('matches all six sample mappings against the actual PDF widgets', async () => {
+  it('matches every sample-data mapping against the actual PDF widgets', async () => {
     const templateBytes = await readFile(
       resolve(process.cwd(), 'examples/templates/f1040-2025.pdf'),
     )

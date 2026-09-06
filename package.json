@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "generate:1040-profile": "node scripts/generate-form-1040-2025-annotation.mjs",
     "validate:examples": "node scripts/validate-examples.mjs",
     "preview": "vite preview"
   },

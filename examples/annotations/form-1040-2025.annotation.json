@@ -50,19 +50,18 @@
   },
   "fields": [
     {
-      "id": "form1040.taxpayer.firstName",
+      "id": "form1040.taxpayer.firstAndMiddleInitial",
       "label": "Taxpayer first name and middle initial",
-      "description": "The taxpayer's first name and optional middle initial on page 1.",
       "page": 1,
       "source": {
         "kind": "json-pointer",
-        "pointer": "/returns/federal/2025/taxpayer/identity/legalName/first"
+        "pointer": "/returns/federal/2025/taxpayer/identity/legalName/firstAndMiddleInitial"
       },
       "box": {
-        "x": 0.058824,
-        "y": 0.118686,
-        "width": 0.351716,
-        "height": 0.017678
+        "x": 0.058823529,
+        "y": 0.118685606,
+        "width": 0.351715686,
+        "height": 0.01767803
       },
       "format": {
         "type": "text",
@@ -79,10 +78,10 @@
         "pointer": "/returns/federal/2025/taxpayer/identity/legalName/last"
       },
       "box": {
-        "x": 0.413399,
-        "y": 0.118686,
-        "width": 0.350082,
-        "height": 0.017678
+        "x": 0.413398693,
+        "y": 0.118685606,
+        "width": 0.350081699,
+        "height": 0.01767803
       },
       "format": {
         "type": "text",
@@ -118,18 +117,541 @@
       }
     },
     {
+      "id": "form1040.taxpayer.address.street",
+      "label": "Home address",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/street"
+      },
+      "box": {
+        "x": 0.058823529,
+        "y": 0.179294192,
+        "width": 0.622303922,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.apartment",
+      "label": "Apartment number",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/apartment"
+      },
+      "box": {
+        "x": 0.683986928,
+        "y": 0.179294192,
+        "width": 0.079493464,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.city",
+      "label": "City, town, or post office",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/city"
+      },
+      "box": {
+        "x": 0.058823529,
+        "y": 0.209594697,
+        "width": 0.481127451,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.state",
+      "label": "State",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/state"
+      },
+      "box": {
+        "x": 0.542810458,
+        "y": 0.209594697,
+        "width": 0.103022876,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.zipCode",
+      "label": "ZIP code",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/zipCode"
+      },
+      "box": {
+        "x": 0.64869281,
+        "y": 0.209594697,
+        "width": 0.114787582,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.foreignCountryName",
+      "label": "Foreign country name",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/foreignCountryName"
+      },
+      "box": {
+        "x": 0.058823529,
+        "y": 0.23989899,
+        "width": 0.304656863,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.foreignProvince",
+      "label": "Foreign province, state, or county",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/foreignProvince"
+      },
+      "box": {
+        "x": 0.366339869,
+        "y": 0.23989899,
+        "width": 0.279493464,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.taxpayer.address.foreignPostalCode",
+      "label": "Foreign postal code",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/address/foreignPostalCode"
+      },
+      "box": {
+        "x": 0.64869281,
+        "y": 0.23989899,
+        "width": 0.114787582,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.presidentialElectionCampaign.taxpayer",
+      "label": "Presidential Election Campaign: taxpayer",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/presidentialElectionCampaign"
+      },
+      "box": {
+        "x": 0.788235294,
+        "y": 0.245578283,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
       "id": "form1040.filingStatus.single",
-      "label": "Single filing status",
+      "label": "Filing status: single",
       "page": 1,
       "source": {
         "kind": "json-pointer",
         "pointer": "/returns/federal/2025/taxpayer/filingStatus/single"
       },
       "box": {
-        "x": 0.159475,
-        "y": 0.260101,
-        "width": 0.013072,
-        "height": 0.010101
+        "x": 0.15947549,
+        "y": 0.26010101,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.filingStatus.marriedFilingJointly",
+      "label": "Filing status: married filing jointly",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/marriedFilingJointly"
+      },
+      "box": {
+        "x": 0.571240196,
+        "y": 0.26010101,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.filingStatus.marriedFilingSeparately",
+      "label": "Filing status: married filing separately",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/marriedFilingSeparately"
+      },
+      "box": {
+        "x": 0.15947549,
+        "y": 0.275251263,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.filingStatus.headOfHousehold",
+      "label": "Filing status: head of household",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/headOfHousehold"
+      },
+      "box": {
+        "x": 0.571240196,
+        "y": 0.275251263,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.filingStatus.qualifyingSurvivingSpouse",
+      "label": "Filing status: qualifying surviving spouse",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/qualifyingSurvivingSpouse"
+      },
+      "box": {
+        "x": 0.15947549,
+        "y": 0.290401515,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.filingStatus.qualifyingPersonName",
+      "label": "Qualifying person name",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/qualifyingPersonName"
+      },
+      "box": {
+        "x": 0.591503268,
+        "y": 0.310604798,
+        "width": 0.349673203,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.filingStatus.nonresidentAlienSpouse",
+      "label": "Nonresident alien spouse election",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/filingStatus/nonresidentAlienSpouse"
+      },
+      "box": {
+        "x": 0.15947549,
+        "y": 0.325915404,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.digitalAssets.yes",
+      "label": "Digital assets: yes",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/digitalAssets/receivedOrDisposed"
+      },
+      "box": {
+        "x": 0.847058824,
+        "y": 0.362373737,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.digitalAssets.no",
+      "label": "Digital assets: no",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/digitalAssets/didNotReceiveOrDispose"
+      },
+      "box": {
+        "x": 0.905882353,
+        "y": 0.362373737,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.dependents.0.firstName",
+      "label": "Dependent 1 first name",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/legalName/first"
+      },
+      "box": {
+        "x": 0.236928105,
+        "y": 0.390150253,
+        "width": 0.173611111,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.dependents.0.lastName",
+      "label": "Dependent 1 last name",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/legalName/last"
+      },
+      "box": {
+        "x": 0.236928105,
+        "y": 0.405300505,
+        "width": 0.173611111,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.dependents.0.ssn",
+      "label": "Dependent 1 Social Security number",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/ssn"
+      },
+      "box": {
+        "x": 0.236928105,
+        "y": 0.420450758,
+        "width": 0.173611111,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "#########",
+        "placeholder": "#"
+      },
+      "style": {
+        "characterCells": 9
+      }
+    },
+    {
+      "id": "form1040.dependents.0.relationship",
+      "label": "Dependent 1 relationship",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/relationship"
+      },
+      "box": {
+        "x": 0.236928105,
+        "y": 0.43560101,
+        "width": 0.173611111,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.dependents.0.childTaxCredit",
+      "label": "Dependent 1 qualifies for child tax credit",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/qualifiesForChildTaxCredit"
+      },
+      "box": {
+        "x": 0.241830065,
+        "y": 0.510098485,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.dependents.0.otherDependentCredit",
+      "label": "Dependent 1 qualifies for credit for other dependents",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/dependents/0/qualifiesForCreditForOtherDependents"
+      },
+      "box": {
+        "x": 0.324183007,
+        "y": 0.510098485,
+        "width": 0.013071895,
+        "height": 0.01010101
       },
       "format": {
         "type": "checkbox",
@@ -146,17 +668,1700 @@
     {
       "id": "form1040.line1a.wages",
       "label": "Line 1a wages",
-      "description": "Total amount from Form W-2, box 1.",
       "page": 1,
       "source": {
         "kind": "json-pointer",
         "pointer": "/returns/federal/2025/income/wages"
       },
       "box": {
-        "x": 0.823529,
-        "y": 0.568182,
-        "width": 0.117647,
-        "height": 0.01515
+        "x": 0.823529412,
+        "y": 0.568181818,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1b.householdEmployeeWages",
+      "label": "Line 1b household employee wages",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/householdEmployeeWages"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.583332071,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1c.tipIncomeNotReported",
+      "label": "Line 1c tip income not reported",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/tipIncomeNotReported"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.598486111,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1d.medicaidWaiverPayments",
+      "label": "Line 1d Medicaid waiver payments",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/medicaidWaiverPayments"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.613636364,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1e.dependentCareBenefits",
+      "label": "Line 1e dependent care benefits",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/dependentCareBenefits"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.628786616,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1f.employerAdoptionBenefits",
+      "label": "Line 1f employer adoption benefits",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/employerAdoptionBenefits"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.643940657,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1g.wagesFromForm8919",
+      "label": "Line 1g wages from Form 8919",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/wagesFromForm8919"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.659090909,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1h.otherEarnedIncome",
+      "label": "Line 1h other earned income",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/otherEarnedIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.674241162,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1i.nontaxableCombatPay",
+      "label": "Line 1i nontaxable combat pay election",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/nontaxableCombatPay"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.689395202,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line1z.totalWages",
+      "label": "Line 1z total wages",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/totalWages"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.704545455,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line2a.taxExemptInterest",
+      "label": "Line 2a tax-exempt interest",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/taxExemptInterest"
+      },
+      "box": {
+        "x": 0.411764706,
+        "y": 0.719695707,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line2b.taxableInterest",
+      "label": "Line 2b taxable interest",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/taxableInterest"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.719695707,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line3a.qualifiedDividends",
+      "label": "Line 3a qualified dividends",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/qualifiedDividends"
+      },
+      "box": {
+        "x": 0.411764706,
+        "y": 0.734849747,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line3b.ordinaryDividends",
+      "label": "Line 3b ordinary dividends",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/ordinaryDividends"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.734849747,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line4a.iraDistributions",
+      "label": "Line 4a IRA distributions",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/iraDistributions"
+      },
+      "box": {
+        "x": 0.411764706,
+        "y": 0.765150253,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line4b.iraDistributionsTaxable",
+      "label": "Line 4b taxable IRA distributions",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/iraDistributionsTaxable"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.765150253,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line5a.pensionsAndAnnuities",
+      "label": "Line 5a pensions and annuities",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/pensionsAndAnnuities"
+      },
+      "box": {
+        "x": 0.411764706,
+        "y": 0.795454545,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line5b.pensionsAndAnnuitiesTaxable",
+      "label": "Line 5b taxable pensions and annuities",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/pensionsAndAnnuitiesTaxable"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.795454545,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line6a.socialSecurityBenefits",
+      "label": "Line 6a Social Security benefits",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/socialSecurityBenefits"
+      },
+      "box": {
+        "x": 0.411764706,
+        "y": 0.825758838,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line6b.socialSecurityBenefitsTaxable",
+      "label": "Line 6b taxable Social Security benefits",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/socialSecurityBenefitsTaxable"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.825758838,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line6c.usedLumpSumElection",
+      "label": "Line 6c lump-sum election",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/usedLumpSumElection"
+      },
+      "box": {
+        "x": 0.763398693,
+        "y": 0.843433081,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line7a.capitalGainOrLoss",
+      "label": "Line 7a capital gain or loss",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/capitalGainOrLoss"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.871213384,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line7b.scheduleDNotRequired",
+      "label": "Line 7b Schedule D not required",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/scheduleDNotRequired"
+      },
+      "box": {
+        "x": 0.250326797,
+        "y": 0.889518939,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line8.additionalIncome",
+      "label": "Line 8 additional income from Schedule 1",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/additionalIncomeFromSchedule1"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.901513889,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line9.totalIncome",
+      "label": "Line 9 total income",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/income/totalIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.916667929,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line10.adjustments",
+      "label": "Line 10 adjustments to income",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/adjustments/fromSchedule1"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.931818182,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line11a.adjustedGrossIncome",
+      "label": "Line 11a adjusted gross income",
+      "page": 1,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/adjustments/adjustedGrossIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.946968434,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line11b.adjustedGrossIncome",
+      "label": "Line 11b adjusted gross income",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/adjustments/adjustedGrossIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.045454545,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line12a.someoneCanClaimTaxpayer",
+      "label": "Line 12a someone can claim taxpayer",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/standardDeduction/someoneCanClaimYou"
+      },
+      "box": {
+        "x": 0.332679739,
+        "y": 0.063128788,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line12a.someoneCanClaimSpouse",
+      "label": "Line 12a someone can claim spouse",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/standardDeduction/someoneCanClaimSpouse"
+      },
+      "box": {
+        "x": 0.497385621,
+        "y": 0.063128788,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line12b.spouseItemizesSeparately",
+      "label": "Line 12b spouse itemizes separately",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/standardDeduction/spouseItemizesSeparately"
+      },
+      "box": {
+        "x": 0.188235294,
+        "y": 0.078282828,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line12d.taxpayerBornBefore1961",
+      "label": "Line 12d taxpayer born before January 2, 1961",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/ageAndBlindness/bornBeforeJanuary2Of1961"
+      },
+      "box": {
+        "x": 0.250326797,
+        "y": 0.093433081,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line12d.taxpayerBlind",
+      "label": "Line 12d taxpayer is blind",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/ageAndBlindness/isBlind"
+      },
+      "box": {
+        "x": 0.509150327,
+        "y": 0.093433081,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line12e.standardOrItemizedDeduction",
+      "label": "Line 12e standard or itemized deduction",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/deductions/standardOrItemized"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.121213384,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line13a.qualifiedBusinessIncomeDeduction",
+      "label": "Line 13a qualified business income deduction",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/deductions/qualifiedBusinessIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.136363636,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line14.totalDeductions",
+      "label": "Line 14 total deductions",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/deductions/totalDeductions"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.166667929,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line15.taxableIncome",
+      "label": "Line 15 taxable income",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/deductions/taxableIncome"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.181818182,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line16.usedForm8814",
+      "label": "Line 16 includes Form 8814",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/usedForm8814"
+      },
+      "box": {
+        "x": 0.510784314,
+        "y": 0.199492424,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line16.usedForm4972",
+      "label": "Line 16 includes Form 4972",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/usedForm4972"
+      },
+      "box": {
+        "x": 0.604901961,
+        "y": 0.199492424,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line16.tax",
+      "label": "Line 16 tax",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/tax"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.196968434,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line17.schedule2Tax",
+      "label": "Line 17 amount from Schedule 2",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/amountFromSchedule2"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.212122475,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line18.totalTaxBeforeCredits",
+      "label": "Line 18 total tax before credits",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/totalTaxBeforeCredits"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.227272727,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line19.childTaxCreditOrOtherDependents",
+      "label": "Line 19 child tax credit or credit for other dependents",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/childTaxCreditOrOtherDependents"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.24242298,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line20.schedule3Credit",
+      "label": "Line 20 amount from Schedule 3",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/amountFromSchedule3"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.25757702,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line21.totalCredits",
+      "label": "Line 21 total credits",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/totalCredits"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.272727273,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line22.taxLessCredits",
+      "label": "Line 22 tax less credits",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/taxLessCredits"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.287877525,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line23.otherTaxes",
+      "label": "Line 23 other taxes",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/otherTaxesFromSchedule2"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.303031566,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line24.totalTax",
+      "label": "Line 24 total tax",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxAndCredits/totalTax"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.318181818,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line25a.withholdingFromW2",
+      "label": "Line 25a withholding from Forms W-2",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/withholdingFromW2"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.348486111,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line25b.withholdingFrom1099",
+      "label": "Line 25b withholding from Forms 1099",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/withholdingFrom1099"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.363636364,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line25c.withholdingFromOtherForms",
+      "label": "Line 25c withholding from other forms",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/withholdingFromOtherForms"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.378786616,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line25d.totalWithholding",
+      "label": "Line 25d total withholding",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/totalWithholding"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.393940657,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line26.estimatedTaxPayments",
+      "label": "Line 26 estimated tax payments",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/estimatedTaxPayments"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.409090909,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line27a.earnedIncomeCredit",
+      "label": "Line 27a earned income credit",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/earnedIncomeCredit"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.454545455,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line28.additionalChildTaxCredit",
+      "label": "Line 28 additional child tax credit",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/additionalChildTaxCredit"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.515150253,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line29.americanOpportunityCredit",
+      "label": "Line 29 American opportunity credit",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/americanOpportunityCredit"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.530304293,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line31.otherPaymentsFromSchedule3",
+      "label": "Line 31 amount from Schedule 3",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/otherPaymentsFromSchedule3"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.560604798,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line32.totalOtherPayments",
+      "label": "Line 32 total other payments and refundable credits",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/totalOtherPayments"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.575758838,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line33.totalPayments",
+      "label": "Line 33 total payments",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/payments/totalPayments"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.590909091,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line34.overpaidAmount",
+      "label": "Line 34 amount overpaid",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/overpaidAmount"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.606059343,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line35a.refundAmount",
+      "label": "Line 35a refund amount",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/refundAmount"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.621213384,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line35b.routingNumber",
+      "label": "Line 35b routing number",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/directDeposit/routingNumber"
+      },
+      "box": {
+        "x": 0.294117647,
+        "y": 0.636363636,
+        "width": 0.211764706,
+        "height": 0.013890152
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "#########",
+        "placeholder": "#"
+      },
+      "style": {
+        "characterCells": 9
+      }
+    },
+    {
+      "id": "form1040.line35c.checkingAccount",
+      "label": "Line 35c checking account",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/directDeposit/isChecking"
+      },
+      "box": {
+        "x": 0.616666667,
+        "y": 0.638887626,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line35c.savingsAccount",
+      "label": "Line 35c savings account",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/directDeposit/isSavings"
+      },
+      "box": {
+        "x": 0.710784314,
+        "y": 0.638887626,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.line35d.accountNumber",
+      "label": "Line 35d account number",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/directDeposit/accountNumber"
+      },
+      "box": {
+        "x": 0.294117647,
+        "y": 0.651513889,
+        "width": 0.4,
+        "height": 0.013890152
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "###########",
+        "placeholder": "#"
+      },
+      "style": {
+        "characterCells": 17
+      }
+    },
+    {
+      "id": "form1040.line36.appliedToEstimatedTax",
+      "label": "Line 36 applied to estimated tax",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/refund/appliedToEstimatedTax"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.666667929,
+        "width": 0.116421569,
+        "height": 0.015150253
       },
       "format": {
         "type": "money",
@@ -173,17 +2378,16 @@
     {
       "id": "form1040.line37.amountOwed",
       "label": "Line 37 amount owed",
-      "description": "Amount owed after subtracting line 33 from line 24.",
       "page": 2,
       "source": {
         "kind": "json-pointer",
         "pointer": "/returns/federal/2025/summary/amountOwed"
       },
       "box": {
-        "x": 0.823529,
-        "y": 0.69697,
-        "width": 0.117647,
-        "height": 0.015153
+        "x": 0.823529412,
+        "y": 0.696969697,
+        "width": 0.117647059,
+        "height": 0.015152778
       },
       "format": {
         "type": "money",
@@ -195,6 +2399,376 @@
       },
       "style": {
         "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.line38.estimatedTaxPenalty",
+      "label": "Line 38 estimated tax penalty",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/summary/estimatedTaxPenalty"
+      },
+      "box": {
+        "x": 0.670588235,
+        "y": 0.712122475,
+        "width": 0.116421569,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "money",
+        "decimalPlaces": 0,
+        "useThousandsSeparator": true,
+        "showCurrencySymbol": false,
+        "currencySymbol": "$",
+        "negativeStyle": "minus"
+      },
+      "style": {
+        "horizontalAlign": "right"
+      }
+    },
+    {
+      "id": "form1040.thirdPartyDesignee.yes",
+      "label": "Allow third-party designee: yes",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/thirdPartyDesignee/allowDiscussion"
+      },
+      "box": {
+        "x": 0.705882353,
+        "y": 0.729481061,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.thirdPartyDesignee.no",
+      "label": "Allow third-party designee: no",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/thirdPartyDesignee/doNotAllowDiscussion"
+      },
+      "box": {
+        "x": 0.882352941,
+        "y": 0.729481061,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.thirdPartyDesignee.name",
+      "label": "Third-party designee name",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/thirdPartyDesignee/name"
+      },
+      "box": {
+        "x": 0.211764706,
+        "y": 0.75,
+        "width": 0.270588235,
+        "height": 0.022727273
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.thirdPartyDesignee.phone",
+      "label": "Third-party designee phone number",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/thirdPartyDesignee/phone"
+      },
+      "box": {
+        "x": 0.529411765,
+        "y": 0.75,
+        "width": 0.164705882,
+        "height": 0.022727273
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.thirdPartyDesignee.pin",
+      "label": "Third-party designee PIN",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/thirdPartyDesignee/personalIdentificationNumber"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.75757702,
+        "width": 0.117647059,
+        "height": 0.014518939
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "#####",
+        "placeholder": "#"
+      },
+      "style": {
+        "characterCells": 5
+      }
+    },
+    {
+      "id": "form1040.signature.taxpayerOccupation",
+      "label": "Taxpayer occupation",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/signature/taxpayerOccupation"
+      },
+      "box": {
+        "x": 0.531045752,
+        "y": 0.815657828,
+        "width": 0.220669935,
+        "height": 0.025251263
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.signature.taxpayerIdentityProtectionPin",
+      "label": "Taxpayer identity protection PIN",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/identityProtectionPin"
+      },
+      "box": {
+        "x": 0.823529412,
+        "y": 0.825758838,
+        "width": 0.117647059,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "######",
+        "placeholder": "#"
+      },
+      "style": {
+        "characterCells": 6
+      }
+    },
+    {
+      "id": "form1040.signature.phone",
+      "label": "Taxpayer phone number",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/phone"
+      },
+      "box": {
+        "x": 0.208495098,
+        "y": 0.878786616,
+        "width": 0.237338235,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.signature.email",
+      "label": "Taxpayer email address",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/taxpayer/identity/email"
+      },
+      "box": {
+        "x": 0.529411765,
+        "y": 0.878786616,
+        "width": 0.411764706,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.name",
+      "label": "Paid preparer name",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/name"
+      },
+      "box": {
+        "x": 0.149671569,
+        "y": 0.906566919,
+        "width": 0.213808824,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.ptin",
+      "label": "Paid preparer PTIN",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/ptin"
+      },
+      "box": {
+        "x": 0.742810458,
+        "y": 0.906566919,
+        "width": 0.09125817,
+        "height": 0.01767803
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.selfEmployed",
+      "label": "Paid preparer is self-employed",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/isSelfEmployed"
+      },
+      "box": {
+        "x": 0.847058824,
+        "y": 0.90972096,
+        "width": 0.013071895,
+        "height": 0.01010101
+      },
+      "format": {
+        "type": "checkbox",
+        "trueMark": "X",
+        "falseMark": ""
+      },
+      "style": {
+        "fontSizePt": 8,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle",
+        "paddingPt": 0
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.firmName",
+      "label": "Paid preparer firm name",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/firmName"
+      },
+      "box": {
+        "x": 0.219933007,
+        "y": 0.924241162,
+        "width": 0.520017974,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.firmPhone",
+      "label": "Paid preparer firm phone number",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/firmPhone"
+      },
+      "box": {
+        "x": 0.808169935,
+        "y": 0.924241162,
+        "width": 0.133006536,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.firmAddress",
+      "label": "Paid preparer firm address",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/firmAddress"
+      },
+      "box": {
+        "x": 0.233004902,
+        "y": 0.939395202,
+        "width": 0.506946078,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "text",
+        "trim": true,
+        "case": "preserve"
+      }
+    },
+    {
+      "id": "form1040.paidPreparer.firmEin",
+      "label": "Paid preparer firm EIN",
+      "page": 2,
+      "source": {
+        "kind": "json-pointer",
+        "pointer": "/returns/federal/2025/paidPreparer/firmEin"
+      },
+      "box": {
+        "x": 0.808169935,
+        "y": 0.939395202,
+        "width": 0.133006536,
+        "height": 0.015150253
+      },
+      "format": {
+        "type": "masked-identifier",
+        "mask": "#########",
+        "placeholder": "#"
       }
     }
   ]

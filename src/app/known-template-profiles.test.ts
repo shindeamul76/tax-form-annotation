@@ -7,7 +7,7 @@ const FORM_1040_2025_SHA256 =
 describe('findKnownTemplateProfile', () => {
   it('returns the verified profile only for its exact template checksum', () => {
     expect(findKnownTemplateProfile(FORM_1040_2025_SHA256)?.fields).toHaveLength(
-      6,
+      111,
     )
     expect(findKnownTemplateProfile('different-template')).toBeUndefined()
   })

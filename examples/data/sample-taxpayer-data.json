@@ -10,23 +10,164 @@
           "identity": {
             "legalName": {
               "first": "Jordan",
+              "middle": "R",
+              "firstAndMiddleInitial": "Jordan R",
               "last": "Avery"
             },
-            "ssn": "000000000"
+            "ssn": "000000000",
+            "dateOfBirth": "1988-04-17",
+            "occupation": "Software Engineer",
+            "phone": "3125550142",
+            "email": "jordan.avery@example.com",
+            "identityProtectionPin": "000000"
+          },
+          "address": {
+            "street": "4127 Meridian Street",
+            "apartment": "12B",
+            "city": "Springfield",
+            "state": "IL",
+            "zipCode": "62704",
+            "foreignCountryName": null,
+            "foreignProvince": null,
+            "foreignPostalCode": null
           },
           "filingStatus": {
             "single": true,
             "marriedFilingJointly": false,
             "marriedFilingSeparately": false,
             "headOfHousehold": false,
-            "qualifyingSurvivingSpouse": false
+            "qualifyingSurvivingSpouse": false,
+            "nonresidentAlienSpouse": false,
+            "qualifyingPersonName": null
+          },
+          "presidentialElectionCampaign": true,
+          "digitalAssets": {
+            "receivedOrDisposed": false,
+            "didNotReceiveOrDispose": true
+          },
+          "standardDeduction": {
+            "someoneCanClaimYou": false,
+            "someoneCanClaimSpouse": false,
+            "spouseItemizesSeparately": false
+          },
+          "ageAndBlindness": {
+            "bornBeforeJanuary2Of1961": false,
+            "isBlind": false
           }
         },
+        "spouse": null,
+        "dependents": [
+          {
+            "legalName": {
+              "first": "Robin",
+              "last": "Avery"
+            },
+            "ssn": "000000001",
+            "relationship": "Parent",
+            "qualifiesForChildTaxCredit": false,
+            "qualifiesForCreditForOtherDependents": true
+          }
+        ],
         "income": {
-          "wages": 60000
+          "wages": 60000,
+          "householdEmployeeWages": 0,
+          "tipIncomeNotReported": 0,
+          "medicaidWaiverPayments": 0,
+          "dependentCareBenefits": 0,
+          "employerAdoptionBenefits": 0,
+          "wagesFromForm8919": 0,
+          "otherEarnedIncome": 0,
+          "nontaxableCombatPay": 0,
+          "totalWages": 60000,
+          "taxExemptInterest": 125,
+          "taxableInterest": 340,
+          "qualifiedDividends": 610,
+          "ordinaryDividends": 780,
+          "iraDistributions": 0,
+          "iraDistributionsTaxable": 0,
+          "pensionsAndAnnuities": 0,
+          "pensionsAndAnnuitiesTaxable": 0,
+          "socialSecurityBenefits": 0,
+          "socialSecurityBenefitsTaxable": 0,
+          "usedLumpSumElection": false,
+          "capitalGainOrLoss": 1450,
+          "scheduleDNotRequired": true,
+          "additionalIncomeFromSchedule1": 0,
+          "totalIncome": 62570
+        },
+        "adjustments": {
+          "fromSchedule1": 3000,
+          "adjustedGrossIncome": 59570
+        },
+        "deductions": {
+          "standardOrItemized": 15750,
+          "usesItemizedDeductions": false,
+          "qualifiedBusinessIncome": 0,
+          "totalDeductions": 15750,
+          "taxableIncome": 43820
+        },
+        "taxAndCredits": {
+          "tax": 4728,
+          "usedForm8814": false,
+          "usedForm4972": false,
+          "amountFromSchedule2": 0,
+          "totalTaxBeforeCredits": 4728,
+          "childTaxCreditOrOtherDependents": 500,
+          "amountFromSchedule3": 0,
+          "totalCredits": 500,
+          "taxLessCredits": 4228,
+          "otherTaxesFromSchedule2": 0,
+          "totalTax": 4228
+        },
+        "payments": {
+          "withholdingFromW2": 2978,
+          "withholdingFrom1099": 0,
+          "withholdingFromOtherForms": 0,
+          "totalWithholding": 2978,
+          "estimatedTaxPayments": 0,
+          "earnedIncomeCredit": 0,
+          "additionalChildTaxCredit": 0,
+          "americanOpportunityCredit": 0,
+          "otherPaymentsFromSchedule3": 0,
+          "totalOtherPayments": 0,
+          "totalPayments": 2978
+        },
+        "refund": {
+          "overpaidAmount": 0,
+          "refundAmount": 0,
+          "appliedToEstimatedTax": 0,
+          "directDeposit": {
+            "routingNumber": "000000000",
+            "accountType": "checking",
+            "isChecking": true,
+            "isSavings": false,
+            "accountNumber": "00001234567"
+          }
         },
         "summary": {
-          "amountOwed": 1250
+          "amountOwed": 1250,
+          "estimatedTaxPenalty": 0
+        },
+        "thirdPartyDesignee": {
+          "allowDiscussion": true,
+          "doNotAllowDiscussion": false,
+          "name": "Casey Lin",
+          "phone": "3125550188",
+          "personalIdentificationNumber": "00000"
+        },
+        "signature": {
+          "signedDate": "2026-04-15",
+          "taxpayerOccupation": "Software Engineer",
+          "spouseOccupation": null
+        },
+        "paidPreparer": {
+          "name": "Morgan Ellis",
+          "ptin": "P00000000",
+          "isSelfEmployed": false,
+          "firmName": "Ellis Tax Advisory LLC",
+          "firmEin": "000000000",
+          "firmAddress": "88 Lakeside Drive, Springfield, IL 62701",
+          "firmPhone": "3125550175"
         }
       }
     }
