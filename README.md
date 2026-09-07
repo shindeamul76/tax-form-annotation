@@ -35,6 +35,7 @@ npm run dev
 ```
 
 Vite prints the local development URL in the terminal, normally `http://localhost:5173`.
+Deployed link - https://starlit-gumption-8fd1cf.netlify.app/
 
 ## Quick demo
 
